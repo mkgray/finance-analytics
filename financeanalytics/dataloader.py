@@ -1,6 +1,10 @@
 import logging
+import re
+
 from pathlib import Path
 
+# TODO: Log dropped files in each of the filter stages for user feedback
+# TODO: Add graphical interface for root folder selection
 
 class DataLoader:
     """
@@ -24,9 +28,21 @@ class DataLoader:
         """
         raw_list = self._detect_all_files_folders(root_folder)
         supported_bank_files = self._remove_unsupported_banks(raw_list)
-        structured_data = self._structure_cleaned_file_listing(supported_bank_files)
+        cleaned_file_list = self._remove_files_missing_dates(supported_bank_files)
+        structured_data = self._structure_cleaned_file_listing(cleaned_file_list)
         cleaned_structured_data = self._clean_structured_data(structured_data)
         return cleaned_structured_data
+
+    def _remove_files_missing_dates(self, list_of_files):
+        """Removes files which do not contain a datestamp for structured handling
+
+        :param list_of_files: list of all files detected in locatoin specified by user
+        :return: list of Path files for only files which contain date stamps
+        """
+
+        datestamp_pattern = re.compile("[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])")
+
+        return [x for x in list_of_files if re.search(datestamp_pattern, str(x))]
 
     def _remove_unsupported_banks(self, list_of_all_filepaths):
         """Removes any PDF folders and files which are not supported downstream (based on Banks supported)

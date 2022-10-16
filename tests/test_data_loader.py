@@ -68,5 +68,25 @@ class TestDataLoader(unittest.TestCase):
 
         self.assertEqual(expected_output, output)
 
+    def test_filter_files_missing_dates(self):
+        input_files = ["root_folder/RBC/Chequing/Chequing Statement-9999 2000-01-01.pdf",
+                       "root_folder/RBC/Chequing/Chequing Statement-9999.pdf",
+                       "root_folder/RBC/Visa/Visa Statement-0000 2000-01-01.pdf",
+                       "root_folder/RBC/Visa/Visa Statement-0000.pdf",
+                       ]
+
+        expected_files = ["root_folder/RBC/Chequing/Chequing Statement-9999 2000-01-01.pdf",
+                          "root_folder/RBC/Visa/Visa Statement-0000 2000-01-01.pdf"
+                       ]
+
+        proper_input = [Path(x) for x in input_files]
+        expected_output = [Path(x) for x in expected_files]
+
+        DataLoader = dataloader.DataLoader()
+
+        output = DataLoader._remove_files_missing_dates(proper_input)
+
+        self.assertEqual(expected_output, output)
+
 if __name__ == '__main__':
     unittest.main()

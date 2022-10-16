@@ -28,21 +28,27 @@ class DataLoader:
         cleaned_structured_data = self._clean_structured_data(structured_data)
         return cleaned_structured_data
 
-    def _remove_unsupported_banks(self, raw_list):
-        """Removes any files or empty folders which will cause downstream processing issues.
+    def _remove_unsupported_banks(self, list_of_all_filepaths):
+        """Removes any PDF folders and files which are not supported downstream (based on Banks supported)
 
         :param raw_list: list of all files and folders detected in location specified by user
-        :return:
+        :return: list of Path files for only supported banks
         """
-        cleaned_list_stage_1 = self.__filter_whitelisted_banks(raw_list)
-        cleaned_list_stage_2 = self.__filter_non_pdfs(cleaned_list_stage_1)
-        return cleaned_list_stage_2
 
-    def __filter_whitelisted_banks(self, input_list):
-        return 0
+        list_of_all_supported_banks = self.supported_banks
 
-    def __filter_non_pdfs(self, input_list):
-        return 0
+        # Converts all filepath folders into pieces for comparison against the supported bank whitelist
+        # All filepaths are converted to lowercase to make the Bank folder case insensitive
+
+        filtered_files = [file for file in list_of_all_filepaths if any(
+            whitelisted_bank in [path_folder.lower() for path_folder in list(file.parts)] for whitelisted_bank in
+            list_of_all_supported_banks)]
+
+        # Output as info for user if needed
+        logging.info("Files Detected:")
+        [logging.info(x) for x in filtered_files]
+
+        return filtered_files
 
     def _detect_relevant_files(self, root_folder):
         """Identifies all relevant files for analysis.
@@ -51,7 +57,7 @@ class DataLoader:
 
         :param root_folder: root location where hierarchy and statement files begin
         :type root_folder: string
-        :return: list
+        :return: list of Path objects to file locations
         """
         found_files = [x for x in Path(root_folder).glob('**/*.pdf')]
 
@@ -60,3 +66,6 @@ class DataLoader:
         [logging.info(x) for x in found_files]
 
         return found_files
+
+    def __init__(self, supported_banks=["rbc"]):
+        self.supported_banks = supported_banks

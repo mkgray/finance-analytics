@@ -109,21 +109,21 @@ class TestDataLoader(unittest.TestCase):
                        ["RBC", "GROUPA", "GROUPA-1", "root_folder/RBC/GroupA/GroupA-1/Statement 2000-02-01.pdf"],
                        ["RBC", "GROUPA", "GROUPA-2", "root_folder/RBC/GroupA/GroupA-2/Statement 2000-01-01.pdf"],
                        ["RBC", "GROUPA", "GROUPA-2", "root_folder/RBC/GroupA/GroupA-2/Statement 2000-02-01.pdf"],
-                       ["RBC", "GROUPB", None, "root_folder/RBC/GroupB/Statement 2000-01-01.pdf"],
-                       ["RBC", "GROUPB", None, "root_folder/RBC/GroupB/Statement 2000-02-01.pdf"],
-                       ["TD", "GROUPA", "GROUPA-1", "root_folder/RBC/GroupA/GroupA-1/Statement 2000-01-01.pdf"],
-                       ["TD", "GROUPA", "GROUPA-1", "root_folder/RBC/GroupA/GroupA-1/Statement 2000-02-01.pdf"],
-                       ["TD", "GROUPA", "GROUPA-3", "root_folder/RBC/GroupA/GroupA-3/Statement 2000-01-01.pdf"],
-                       ["TD", "GROUPA", "GROUPA-3", "root_folder/RBC/GroupA/GroupA-3/Statement 2000-02-01.pdf"],
+                       ["RBC", "GROUPB", "NONE", "root_folder/RBC/GroupB/Statement 2000-01-01.pdf"],
+                       ["RBC", "GROUPB", "NONE", "root_folder/RBC/GroupB/Statement 2000-02-01.pdf"],
+                       ["TD", "GROUPA", "GROUPA-1", "root_folder/TD/GroupA/GroupA-1/Statement 2000-01-01.pdf"],
+                       ["TD", "GROUPA", "GROUPA-1", "root_folder/TD/GroupA/GroupA-1/Statement 2000-02-01.pdf"],
+                       ["TD", "GROUPA", "GROUPA-3", "root_folder/TD/GroupA/GroupA-3/Statement 2000-01-01.pdf"],
+                       ["TD", "GROUPA", "GROUPA-3", "root_folder/TD/GroupA/GroupA-3/Statement 2000-02-01.pdf"],
                        ]
 
-        expected_output = pd.DataFrame(output_data, columns=["Bank", "Level1", "Level2", "Filepath"])
+        expected_output = pd.DataFrame(output_data, columns=["Bank", "Level 1", "Level 2", "Filepath"])
 
         DataLoader = dataloader.DataLoader()
 
         actual_output = DataLoader._structure_cleaned_file_listing(proper_input)
 
-        self.assertEqual(expected_output, actual_output)
+        pd.testing.assert_frame_equal(expected_output, actual_output)
 
     def test_structure_data_2(self):
         # Testing for case insensitivity
@@ -136,18 +136,18 @@ class TestDataLoader(unittest.TestCase):
         proper_input = [Path(x) for x in input_files]
 
         output_data = [["RBC", "GROUPA", "GROUPA-1", "root_folder/RBC/GroupA/GroupA-1/Statement 2000-01-01.pdf"],
-                       ["RBC", "GROUPA", "GROUPA-1", "root_folder/RBC/GroupA/GroupA-1/Statement 2000-02-01.pdf"],
-                       ["RBC", "GROUPA", "GROUPA-1", "root_folder/RBC/GroupA/GroupA-1/Statement 2000-03-01.pdf"],
-                       ["RBC", "GROUPA", "GROUPA-1", "root_folder/RBC/GroupA/GroupA-1/Statement 2000-04-01.pdf"]
+                       ["RBC", "GROUPA", "GROUPA-1", "root_folder/RBC/GroupA/groupa-1/Statement 2000-02-01.pdf"],
+                       ["RBC", "GROUPA", "GROUPA-1", "root_folder/rBC/GroupA/GroupA-1/Statement 2000-03-01.pdf"],
+                       ["RBC", "GROUPA", "GROUPA-1", "root_folder/rbc/groupa/GroupA-1/Statement 2000-04-01.pdf"]
                        ]
 
-        expected_output = pd.DataFrame(output_data, columns=["Bank", "Level1", "Level2", "Filepath"])
+        expected_output = pd.DataFrame(output_data, columns=["Bank", "Level 1", "Level 2", "Filepath"])
 
         DataLoader = dataloader.DataLoader()
 
         actual_output = DataLoader._structure_cleaned_file_listing(proper_input)
 
-        self.assertEqual(expected_output, actual_output)
+        pd.testing.assert_frame_equal(expected_output, actual_output)
 
     def test_structure_data_3(self):
         # Testing for no level hierarchy only bank folder
@@ -167,7 +167,7 @@ class TestDataLoader(unittest.TestCase):
 
         actual_output = DataLoader._structure_cleaned_file_listing(proper_input)
 
-        self.assertEqual(expected_output, actual_output)
+        pd.testing.assert_frame_equal(expected_output, actual_output)
 
     def test_structure_data_4(self):
         # Testing for many files on many levels
@@ -181,22 +181,22 @@ class TestDataLoader(unittest.TestCase):
 
         proper_input = [Path(x) for x in input_files]
 
-        output_data = [["RBC", "A", "B", "C", "D", "E", "root_folder/RBC/GroupA/GroupA-1/Statement 2000-01-01.pdf"],
-                       ["RBC", "A", "B", "C", "D", None, "root_folder/RBC/GroupA/GroupA-1/Statement 2000-02-01.pdf"],
-                       ["RBC", "A", "B", "C", None, None, "root_folder/RBC/GroupA/GroupA-1/Statement 2000-03-01.pdf"],
-                       ["RBC", "A", "B", None, None, None, "root_folder/RBC/GroupA/GroupA-1/Statement 2000-04-01.pdf"],
-                       ["RBC", "A", None, None, None, None, "root_folder/RBC/GroupA/GroupA-1/Statement 2000-05-01.pdf"],
-                       ["RBC", None, None, None, None, None, "root_folder/RBC/GroupA/GroupA-1/Statement 2000-06-01.pdf"]
+        output_data = [["RBC", "A", "B", "C", "D", "E", "root_folder/RBC/A/B/C/D/E/Statement 2000-01-01.pdf"],
+                       ["RBC", "A", "B", "C", "D", "NONE", "root_folder/RBC/A/B/C/D/Statement 2000-02-01.pdf"],
+                       ["RBC", "A", "B", "C", "NONE", "NONE", "root_folder/RBC/A/B/C/Statement 2000-03-01.pdf"],
+                       ["RBC", "A", "B", "NONE", "NONE", "NONE", "root_folder/RBC/A/B/Statement 2000-04-01.pdf"],
+                       ["RBC", "A", "NONE", "NONE", "NONE", "NONE", "root_folder/RBC/A/Statement 2000-05-01.pdf"],
+                       ["RBC", "NONE", "NONE", "NONE", "NONE", "NONE", "root_folder/RBC/Statement 2000-06-01.pdf"]
                        ]
 
-        expected_output = pd.DataFrame(output_data, columns=["Bank", "Level1", "Level2", "Level3", "Level4", "Level5",
-                                                             "Filepath"])
+        expected_output = pd.DataFrame(output_data, columns=["Bank", "Level 1", "Level 2", "Level 3", "Level 4",
+                                                             "Level 5", "Filepath"])
 
         DataLoader = dataloader.DataLoader()
 
         actual_output = DataLoader._structure_cleaned_file_listing(proper_input)
 
-        self.assertEqual(expected_output, actual_output)
+        pd.testing.assert_frame_equal(expected_output, actual_output)
 
 if __name__ == '__main__':
     unittest.main()

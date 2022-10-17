@@ -1,6 +1,8 @@
 import logging
 import re
 
+import pandas as pd
+
 from pathlib import Path
 
 # TODO: Log dropped files in each of the filter stages for user feedback
@@ -32,6 +34,35 @@ class DataLoader:
         structured_data = self._structure_cleaned_file_listing(cleaned_file_list)
         cleaned_structured_data = self._clean_structured_data(structured_data)
         return cleaned_structured_data
+
+    def _structure_cleaned_file_listing(self, file_list):
+        """Converts list of files to be parsed into a structured format for initial data quality analysis
+
+        :param file_list: list of all files to be structured
+        :return: DataFrame of structure file breakdown including Bank, Hierarchy of Levels, and Filepath
+        """
+
+        # Convert directly to a DataFrame and drop the root folder and filename
+        df = pd.DataFrame([x.parts[1:-1] for x in file_list])
+
+        # Set up proper column names starting with Bank and Hierarchy Levels
+        number_of_hierarchy_levels = len(df.columns) - 1
+        hierarchy_columns = ["Bank"]
+        hierarchy_columns.extend(["Level " + str(x + 1) for x in range(number_of_hierarchy_levels)])
+        df.columns = hierarchy_columns
+
+        # Convert all values to uppercase for case insensitivity of analytics
+        df = df.apply(lambda x: x.astype(str).str.upper())
+
+        logging.info("Detected {nhierarchy} hierarchy levels in data".format(nhierarchy = number_of_hierarchy_levels))
+
+        # Manually convert Filepaths to Path format due to Pandas using OS specific format
+        df["Filepath"] = ['/'.join(x.parts) for x in file_list]
+
+        logging.info("Resultant structured table:")
+        logging.info(df)
+
+        return df
 
     def _remove_files_missing_dates(self, list_of_files):
         """Removes files which do not contain a datestamp for structured handling

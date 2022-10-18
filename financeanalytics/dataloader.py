@@ -5,7 +5,6 @@ import pandas as pd
 
 from pathlib import Path
 
-# TODO: Log dropped files in each of the filter stages for user feedback
 # TODO: Add graphical interface for root folder selection
 
 class DataLoader:
@@ -32,8 +31,7 @@ class DataLoader:
         supported_bank_files = self._remove_unsupported_banks(raw_list)
         cleaned_file_list = self._remove_files_missing_dates(supported_bank_files)
         structured_data = self._structure_cleaned_file_listing(cleaned_file_list)
-        cleaned_structured_data = self._clean_structured_data(structured_data)
-        return cleaned_structured_data
+        return structured_data
 
     def _structure_cleaned_file_listing(self, file_list):
         """Converts list of files to be parsed into a structured format for initial data quality analysis

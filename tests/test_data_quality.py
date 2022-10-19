@@ -14,12 +14,12 @@ class TestDataQuality(unittest.TestCase):
                                    ["RBC", "root_folder/RBC/Statement 2000-05-08.pdf"]],
                                   columns=["Bank", "Filepath"])
 
-        expected_output = pd.DataFrame([["RBC", "2000-01-01", "root_folder/RBC/Statement 2000-01-06.pdf"],
-                                        ["RBC", "2000-02-01", "root_folder/RBC/Statement 2000-02-09.pdf"],
-                                        ["RBC", "2000-03-01", "root_folder/RBC/Statement 2000-03-13.pdf"],
-                                        ["RBC", "2000-04-01", "root_folder/RBC/Statement 2000-04-06.pdf"],
-                                        ["RBC", "2000-05-01", "root_folder/RBC/Statement 2000-05-08.pdf"]],
-                                  columns=["Bank", "MonthStamp", "Filepath"])
+        expected_output = pd.DataFrame([["RBC", "root_folder/RBC/Statement 2000-01-06.pdf", "2000-01-01"],
+                                        ["RBC", "root_folder/RBC/Statement 2000-02-09.pdf", "2000-02-01"],
+                                        ["RBC", "root_folder/RBC/Statement 2000-03-13.pdf", "2000-03-01"],
+                                        ["RBC", "root_folder/RBC/Statement 2000-04-06.pdf", "2000-04-01"],
+                                        ["RBC", "root_folder/RBC/Statement 2000-05-08.pdf", "2000-05-01"]],
+                                  columns=["Bank", "Filepath", "MonthStamp"])
 
         DataQuality = dataquality.DataQuality()
 
@@ -34,10 +34,10 @@ class TestDataQuality(unittest.TestCase):
                                    ["RBC", "root_folder/RBC/Statement 2000-05-08.pdf"]],
                                   columns=["Bank", "Filepath"])
 
-        expected_output = pd.DataFrame([["RBC", "2000-01-01", "root_folder/RBC/Statement 2000-01-06.pdf"],
-                                        ["RBC", "2000-03-01", "root_folder/RBC/Statement 2000-03-13.pdf"],
-                                        ["RBC", "2000-05-01", "root_folder/RBC/Statement 2000-05-08.pdf"]],
-                                  columns=["Bank", "MonthStamp", "Filepath"])
+        expected_output = pd.DataFrame([["RBC", "root_folder/RBC/Statement 2000-01-06.pdf", "2000-01-01"],
+                                        ["RBC", "root_folder/RBC/Statement 2000-03-13.pdf", "2000-03-01"],
+                                        ["RBC", "root_folder/RBC/Statement 2000-05-08.pdf", "2000-05-01"]],
+                                  columns=["Bank", "Filepath", "MonthStamp"])
 
         DataQuality = dataquality.DataQuality()
 
@@ -54,12 +54,12 @@ class TestDataQuality(unittest.TestCase):
                                    ["RBC", "A", "A-3", "root_folder/RBC/A/A-3/Statement 2000-05-08.pdf"]],
                                   columns=["Bank", "Level 1", "Level 2", "Filepath"])
 
-        expected_output = pd.DataFrame([["RBC", "A", "A-1", "2000-01-01", "root_folder/RBC/A/A-1/Statement 2000-01-06.pdf"],
-                                        ["RBC", "A", "A-1", "2000-02-01", "root_folder/RBC/A/A-1/Statement 2000-02-09.pdf"],
-                                        ["RBC", "A", "A-2", "2000-03-01", "root_folder/RBC/A/A-2/Statement 2000-03-13.pdf"],
-                                        ["RBC", "A", "A-2", "2000-04-01", "root_folder/RBC/A/A-2/Statement 2000-04-06.pdf"],
-                                        ["RBC", "A", "A-3", "2000-05-01", "root_folder/RBC/A/A-3/Statement 2000-05-08.pdf"]],
-                                  columns=["Bank", "Level 1", "Level 2", "Filepath"])
+        expected_output = pd.DataFrame([["RBC", "A", "A-1", "root_folder/RBC/A/A-1/Statement 2000-01-06.pdf", "2000-01-01"],
+                                        ["RBC", "A", "A-1", "root_folder/RBC/A/A-1/Statement 2000-02-09.pdf", "2000-02-01"],
+                                        ["RBC", "A", "A-2", "root_folder/RBC/A/A-2/Statement 2000-03-13.pdf", "2000-03-01"],
+                                        ["RBC", "A", "A-2", "root_folder/RBC/A/A-2/Statement 2000-04-06.pdf", "2000-04-01"],
+                                        ["RBC", "A", "A-3", "root_folder/RBC/A/A-3/Statement 2000-05-08.pdf", "2000-05-01"]],
+                                  columns=["Bank", "Level 1", "Level 2", "Filepath", "MonthStamp"])
 
         DataQuality = dataquality.DataQuality()
 
@@ -75,15 +75,15 @@ class TestDataQuality(unittest.TestCase):
                                         ["RBC", "A", "B", "NONE", "NONE", "NONE", "root_folder/RBC/A/A-2/Statement 2000-04-06.pdf"],
                                         ["RBC", "A", "NONE", "NONE", "NONE", "NONE", "root_folder/RBC/A/A-3/Statement 2000-05-08.pdf"],
                                         ["RBC", "NONE", "NONE", "NONE", "NONE", "NONE", "root_folder/RBC/A/A-3/Statement 2000-06-04.pdf"]],
-                                  columns=["Bank", "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "MonthStamp", "Filepath"])
+                                  columns=["Bank", "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Filepath"])
 
-        expected_output = pd.DataFrame([["RBC", "A", "B", "C", "D", "E", "2000-01-01", "root_folder/RBC/A/A-1/Statement 2000-01-06.pdf"],
-                                        ["RBC", "A", "B", "C", "D", "NONE", "2000-02-01", "root_folder/RBC/A/A-1/Statement 2000-02-09.pdf"],
-                                        ["RBC", "A", "B", "C", "NONE", "NONE", "2000-03-01", "root_folder/RBC/A/A-2/Statement 2000-03-13.pdf"],
-                                        ["RBC", "A", "B", "NONE", "NONE", "NONE", "2000-04-01", "root_folder/RBC/A/A-2/Statement 2000-04-06.pdf"],
-                                        ["RBC", "A", "NONE", "NONE", "NONE", "NONE", "2000-05-01", "root_folder/RBC/A/A-3/Statement 2000-05-08.pdf"],
-                                        ["RBC", "NONE", "NONE", "NONE", "NONE", "NONE", "2000-06-01", "root_folder/RBC/A/A-3/Statement 2000-06-04.pdf"]],
-                                  columns=["Bank", "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "MonthStamp", "Filepath"])
+        expected_output = pd.DataFrame([["RBC", "A", "B", "C", "D", "E", "root_folder/RBC/A/A-1/Statement 2000-01-06.pdf", "2000-01-01"],
+                                        ["RBC", "A", "B", "C", "D", "NONE", "root_folder/RBC/A/A-1/Statement 2000-02-09.pdf", "2000-02-01"],
+                                        ["RBC", "A", "B", "C", "NONE", "NONE", "root_folder/RBC/A/A-2/Statement 2000-03-13.pdf", "2000-03-01"],
+                                        ["RBC", "A", "B", "NONE", "NONE", "NONE", "root_folder/RBC/A/A-2/Statement 2000-04-06.pdf", "2000-04-01"],
+                                        ["RBC", "A", "NONE", "NONE", "NONE", "NONE", "root_folder/RBC/A/A-3/Statement 2000-05-08.pdf", "2000-05-01"],
+                                        ["RBC", "NONE", "NONE", "NONE", "NONE", "NONE", "root_folder/RBC/A/A-3/Statement 2000-06-04.pdf", "2000-06-01"]],
+                                  columns=["Bank", "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Filepath", "MonthStamp"])
 
         DataQuality = dataquality.DataQuality()
 

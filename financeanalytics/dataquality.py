@@ -1,4 +1,5 @@
 import logging
+import re
 
 class DataQuality:
     """
@@ -37,7 +38,14 @@ class DataQuality:
         :param structured_df:the DataFrame hierarchy and filepath data coming from the DataLoader
         :return:same DataFrame from input with the addition of datestamps for each file (dated to the beginning of each month for easy gap analysis)
         """
-        return 0
+
+        datestamp_pattern = re.compile("[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])")
+
+        # Extract the datestamp and change day to beginning of month
+        structured_df["MonthStamp"] = structured_df["Filepath"].apply(
+            lambda x: datestamp_pattern.search(x).group(0)[:-2] + '01')
+
+        return structured_df
 
     def _aggregate_df_analytics(self, df_with_datestamps):
         """Determines the range and gaps of detected data for all hierarchies

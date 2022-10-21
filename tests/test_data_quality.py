@@ -224,5 +224,81 @@ class TestDataQuality(unittest.TestCase):
 
         pd.testing.assert_frame_equal(expected_output, actual_output)
 
+    def test_gap_detection_bank_only(self):
+
+        input_data = pd.DataFrame([["RBC", "1999-11-01", "2000-03-01", ["1999-11-01", "2000-02-01", "2000-03-01"]],
+                                   ["TD", "1999-11-01", "2000-01-01", ["1999-11-01", "1999-12-01", "2000-01-01"]],
+                                   ["BMO", "1999-11-01", "2000-01-01", ["1999-11-01", "2000-01-01"]],
+                                   ["CIBC", "2000-01-01", "2000-01-01", ["2000-01-01"]]
+                                   ], columns=["Bank", "min_date", "max_date", "all_dates"])
+
+        expected_output = pd.DataFrame([["RBC", "1999-11-01", "2000-03-01", ["1999-11-01", "2000-02-01", "2000-03-01"], ["1999-12-01", "2000-01-01"]],
+                                   ["TD", "1999-11-01", "2000-01-01", ["1999-11-01", "1999-12-01", "2000-01-01"], []],
+                                   ["BMO", "1999-11-01", "2000-01-01", ["1999-11-01", "2000-01-01"], ["1999-12-01"]],
+                                   ["CIBC", "2000-01-01", "2000-01-01", ["2000-01-01"], []]
+                                   ], columns=["Bank", "min_date", "max_date", "all_dates", "all_gaps"])
+
+        DataQuality = dataquality.DataQuality()
+
+        actual_output = DataQuality._aggregate_df_analytics(input_data)
+
+        pd.testing.assert_frame_equal(expected_output, actual_output)
+
+    def test_gap_detection_missing_year(self):
+
+        input_data = pd.DataFrame([["RBC", "1999-12-01", "2001-01-01", ["1999-12-01", "2001-01-01"]]
+                                   ], columns=["Bank", "min_date", "max_date", "all_dates"])
+
+        expected_output = pd.DataFrame([["RBC", "1999-12-01", "2001-01-01", ["1999-12-01", "2001-01-01"], ["2000-01-01", "2000-02-01", "2000-03-01", "2000-04-01", "2000-05-01", "2000-06-01", "2000-07-01", "2000-08-01", "2000-09-01", "2000-10-01", "2000-11-01", "2000-12-01"]]
+                                   ], columns=["Bank", "min_date", "max_date", "all_dates", "all_gaps"])
+
+        DataQuality = dataquality.DataQuality()
+
+        actual_output = DataQuality._aggregate_df_analytics(input_data)
+
+        pd.testing.assert_frame_equal(expected_output, actual_output)
+
+    def test_gap_detection_two_levels(self):
+
+        input_data = pd.DataFrame(
+            [["RBC", "A", "A-1", "1999-10-01", "2000-04-01", ["1999-10-01", "1999-11-01", "2000-02-01", "2000-04-01"]],
+             ["RBC", "A", "A-2", "2000-01-01", "2000-04-01", ["2000-01-01", "2000-02-01", "2000-04-01"]],
+             ["RBC", "B", "B-1", "2000-01-01", "2000-03-01", ["2000-01-01", "2000-02-01", "2000-03-01"]]
+             ], columns=["Bank", "Level 1", "Level 2", "min_date", "max_date", "all_dates"])
+
+        expected_output = pd.DataFrame([["RBC", "A", "A-1", "1999-10-01", "2000-04-01", ["1999-10-01", "1999-11-01", "2000-02-01", "2000-04-01"], ["1999-12-01", "2000-01-01", "2000-03-01"]],
+                                        ["RBC", "A", "A-2", "2000-01-01", "2000-04-01", ["2000-01-01", "2000-02-01", "2000-04-01"], ["2000-03-01"]],
+                                        ["RBC", "B", "B-1", "2000-01-01", "2000-03-01", ["2000-01-01", "2000-02-01", "2000-03-01"], []]
+                                        ], columns=["Bank", "Level 1", "Level 2", "min_date", "max_date", "all_dates", "all_gaps"])
+
+        DataQuality = dataquality.DataQuality()
+
+        actual_output = DataQuality._aggregate_df_analytics(input_data)
+
+        pd.testing.assert_frame_equal(expected_output, actual_output)
+
+    def test_gap_detection_five_levels(self):
+        input_data = pd.DataFrame([["RBC", "A", "B", "C", "D", "E", "2000-01-01", "2000-05-01", ["2000-01-01", "2000-03-01", "2000-05-01"]],
+                                   ["RBC", "A", "B", "C", "D", "NONE", "2000-01-01", "2000-01-01", ["2000-01-01"]],
+                                   ["RBC", "A", "B", "C", "NONE", "NONE", "2000-02-01", "2000-02-01", ["2000-02-01"]],
+                                   ["RBC", "A", "B", "NONE", "NONE", "NONE", "2000-03-01", "2000-03-01", ["2000-03-01"]],
+                                   ["RBC", "A", "NONE", "NONE", "NONE", "NONE", "2000-04-01", "2000-06-01", ["2000-04-01", "2000-06-01"]],
+                                   ["RBC", "NONE", "NONE", "NONE", "NONE", "NONE", "2000-07-01", "2000-07-01", ["2000-07-01"]]
+                                   ], columns=["Bank", "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "min_date", "max_date", "all_dates"])
+
+        expected_output = pd.DataFrame([["RBC", "A", "B", "C", "D", "E", "2000-01-01", "2000-05-01", ["2000-01-01", "2000-03-01", "2000-05-01"], ["2000-02-01", "2000-04-01"]],
+                                        ["RBC", "A", "B", "C", "D", "NONE", "2000-01-01", "2000-01-01", ["2000-01-01"], []],
+                                        ["RBC", "A", "B", "C", "NONE", "NONE", "2000-02-01", "2000-02-01", ["2000-02-01"], []],
+                                        ["RBC", "A", "B", "NONE", "NONE", "NONE", "2000-03-01", "2000-03-01", ["2000-03-01"], []],
+                                        ["RBC", "A", "NONE", "NONE", "NONE", "NONE", "2000-04-01", "2000-06-01", ["2000-04-01", "2000-06-01"], ["2000-05-01"]],
+                                        ["RBC", "NONE", "NONE", "NONE", "NONE", "NONE", "2000-07-01", "2000-07-01", ["2000-07-01"], []]
+                                        ], columns=["Bank", "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "min_date", "max_date", "all_dates", "all_gaps"])
+
+        DataQuality = dataquality.DataQuality()
+
+        actual_output = DataQuality._aggregate_df_analytics(input_data)
+
+        pd.testing.assert_frame_equal(expected_output, actual_output)
+
 if __name__ == '__main__':
     unittest.main()

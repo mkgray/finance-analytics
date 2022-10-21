@@ -30,7 +30,8 @@ class DataQuality:
         """
 
         df_with_extracted_dates = self._extract_month_year_stamps(structured_file_listing)
-        compressed_df = self._aggregate_df_analytics(df_with_extracted_dates)
+        deduplicated_data = self._remove_duplicate_references(df_with_extracted_dates)
+        compressed_df = self._aggregate_df_analytics(deduplicated_data)
 
         return compressed_df
 
@@ -72,3 +73,15 @@ class DataQuality:
         """
 
         return 0
+
+    def _remove_duplicate_references(self, structured_data_with_monthstamp):
+        """Removes duplicate monthstamps from a hierarchy if folder type insensitivity causes case to exist
+
+        :param structured_data_with_monthstamp:DataFrame containing hierarchies and datestamps for each file (month beginning)
+        :return:DataFrame with duplicate components removed
+        """
+
+        # Deduplicate based on Bank and level hierarchy plus the monthstamp found
+        column_names = list(structured_data_with_monthstamp.columns)[:-2] + ['MonthStamp']
+
+        return structured_data_with_monthstamp.drop_duplicates(subset=column_names, keep='first').reset_index(drop=True)

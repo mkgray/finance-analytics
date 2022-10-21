@@ -104,7 +104,7 @@ class TestDataQuality(unittest.TestCase):
 
         expected_output = pd.DataFrame([["RBC", "2000-01-01", "2000-04-01", ["2000-01-01", "2000-02-01", "2000-04-01"]],
                                         ["TD", "2000-01-01", "2000-04-01", ["2000-01-01", "2000-02-01", "2000-03-01", "2000-04-01"]],
-                                   ], columns=["Bank", "Filepath", "MonthStamp"])
+                                   ], columns=["Bank", "min_date", "max_date", "all_dates"])
 
         DataQuality = dataquality.DataQuality()
 
@@ -129,7 +129,7 @@ class TestDataQuality(unittest.TestCase):
         expected_output = pd.DataFrame([["RBC", "A", "A-1", "1999-10-01", "2000-04-01", ["1999-10-01", "1999-11-01", "2000-02-01", "2000-04-01"]],
                                         ["RBC", "A", "A-2", "2000-01-01", "2000-04-01", ["2000-01-01", "2000-02-01", "2000-04-01"]],
                                         ["RBC", "B", "B-1", "2000-01-01", "2000-03-01", ["2000-01-01", "2000-02-01", "2000-03-01"]]
-                                   ], columns=["Bank", "Level 1", "Level 2", "Filepath", "MonthStamp"])
+                                   ], columns=["Bank", "Level 1", "Level 2", "min_date", "max_date", "all_dates"])
 
         DataQuality = dataquality.DataQuality()
 
@@ -156,7 +156,7 @@ class TestDataQuality(unittest.TestCase):
                                         ["RBC", "A", "B", "NONE", "NONE", "NONE", "2000-03-01", "2000-03-01", ["2000-03-01"]],
                                         ["RBC", "A", "NONE", "NONE", "NONE", "NONE", "2000-04-01", "2000-05-01", ["2000-04-01", "2000-05-01"]],
                                         ["RBC", "NONE", "NONE", "NONE", "NONE", "NONE", "2000-06-01", "2000-06-01", ["2000-06-01"]]
-                                   ], columns=["Bank", "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Filepath", "MonthStamp"])
+                                   ], columns=["Bank", "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "min_date", "max_date", "all_dates"])
 
         DataQuality = dataquality.DataQuality()
 

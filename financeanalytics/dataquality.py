@@ -1,6 +1,8 @@
 import logging
 import re
 
+import pandas as pd
+
 class DataQuality:
     """
     A class used to identify data quality issues related to metadata (hierarchies and missing data pieces)
@@ -54,7 +56,13 @@ class DataQuality:
         :return: Aggregated DataFrame with hierarchies, start date (month beginning), end date (month beginning), and collection of all dates (month beginning)
         """
 
-        return 0
+        # Assumes only two suffix columns currently "Date" and "Filepath"
+        # Determine range of each collection and list of all dates found
+        return (df_with_datestamps
+                .groupby(list(df_with_datestamps.columns)[:-2])
+                .agg(min_date=('MonthStamp', 'min'),
+                     max_date=('MonthStamp', 'max'),
+                     all_dates=('MonthStamp', pd.Series.tolist)).reset_index())
 
     def _identify_data_gaps(self, compressed_data):
         """Identifies the data gaps from windowed data

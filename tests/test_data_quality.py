@@ -164,5 +164,65 @@ class TestDataQuality(unittest.TestCase):
 
         pd.testing.assert_frame_equal(expected_output, actual_output)
 
+    def test_remove_duplicate_data_bank_only(self):
+
+        input_data = pd.DataFrame([["RBC", "root_folder/RBC/Statement 2000-01-06.pdf", "2000-01-01"],
+                                   ["RBC", "root_folder/rbc/Statement 2000-01-06.pdf", "2000-01-01"],
+                                   ["RBC", "root_folder/RBC/Statement 2000-03-03.pdf", "2000-03-01"],
+                                   ["RBC", "root_folder/RBC/Statement 2000-04-06.pdf", "2000-04-01"],
+                                   ["RBC", "root_folder/RBC/Statement 2000-05-08.pdf", "2000-05-01"]],
+                                  columns=["Bank", "Filepath", "MonthStamp"])
+
+        expected_output = pd.DataFrame([["RBC", "root_folder/RBC/Statement 2000-01-06.pdf", "2000-01-01"],
+                                        ["RBC", "root_folder/RBC/Statement 2000-03-03.pdf", "2000-03-01"],
+                                        ["RBC", "root_folder/RBC/Statement 2000-04-06.pdf", "2000-04-01"],
+                                        ["RBC", "root_folder/RBC/Statement 2000-05-08.pdf", "2000-05-01"]],
+                                       columns=["Bank", "Filepath", "MonthStamp"])
+
+        DataQuality = dataquality.DataQuality()
+
+        actual_output = DataQuality._remove_duplicate_references(input_data)
+
+        pd.testing.assert_frame_equal(expected_output, actual_output)
+
+    def test_remove_duplicate_data_two_level(self):
+
+        input_data = pd.DataFrame([["RBC", "A", "B", "root_folder/RBC/A/B/Statement 2000-01-06.pdf", "2000-01-01"],
+                                   ["RBC", "A", "B", "root_folder/RBC/a/B/Statement 2000-01-06.pdf", "2000-01-01"],
+                                   ["RBC", "A", "B", "root_folder/RBC/A/B/Statement 2000-02-06.pdf", "2000-02-01"]],
+                                  columns=["Bank", "Level 1", "Level 2", "Filepath", "MonthStamp"])
+
+        expected_output = pd.DataFrame([["RBC", "A", "B", "root_folder/RBC/A/B/Statement 2000-01-06.pdf", "2000-01-01"],
+                                        ["RBC", "A", "B", "root_folder/RBC/A/B/Statement 2000-02-06.pdf", "2000-02-01"]],
+                                       columns=["Bank", "Level 1", "Level 2", "Filepath", "MonthStamp"])
+
+        DataQuality = dataquality.DataQuality()
+
+        actual_output = DataQuality._remove_duplicate_references(input_data)
+
+        pd.testing.assert_frame_equal(expected_output, actual_output)
+
+    def test_remove_duplicate_data_many_levels(self):
+
+        input_data = pd.DataFrame([["RBC", "A", "B", "C", "D", "E", "root_folder/RBC/A/B/C/D/E/Statement 2000-01-06.pdf", "2000-01-01"],
+                                   ["RBC", "A", "B", "C", "D", "E", "root_folder/RBC/a/B/C/D/E/Statement 2000-01-06.pdf", "2000-01-01"],
+                                   ["RBC", "A", "B", "C", "D", "E", "root_folder/RBC/A/B/C/D/E/Statement 2000-03-06.pdf", "2000-03-01"],
+                                   ["RBC", "A", "B", "NONE", "NONE", "NONE", "root_folder/RBC/a/B/Statement 2000-01-06.pdf", "2000-01-01"],
+                                   ["RBC", "A", "B", "NONE", "NONE", "NONE", "root_folder/RBC/A/B/Statement 2000-01-06.pdf", "2000-01-01"],
+                                   ["RBC", "A", "B", "NONE", "NONE", "NONE", "root_folder/RBC/A/B/Statement 2000-02-06.pdf", "2000-02-01"]],
+                                  columns=["Bank", "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Filepath", "MonthStamp"])
+
+        expected_output = pd.DataFrame([["RBC", "A", "B", "C", "D", "E", "root_folder/RBC/A/B/C/D/E/Statement 2000-01-06.pdf", "2000-01-01"],
+                                        ["RBC", "A", "B", "C", "D", "E", "root_folder/RBC/A/B/C/D/E/Statement 2000-03-06.pdf", "2000-03-01"],
+                                        ["RBC", "A", "B", "NONE", "NONE", "NONE", "root_folder/RBC/a/B/Statement 2000-01-06.pdf", "2000-01-01"],
+                                        ["RBC", "A", "B", "NONE", "NONE", "NONE", "root_folder/RBC/A/B/Statement 2000-02-06.pdf", "2000-02-01"]],
+                                       columns=["Bank", "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Filepath", "MonthStamp"])
+
+        DataQuality = dataquality.DataQuality()
+
+        actual_output = DataQuality._remove_duplicate_references(input_data)
+
+        pd.testing.assert_frame_equal(expected_output, actual_output)
+
 if __name__ == '__main__':
     unittest.main()

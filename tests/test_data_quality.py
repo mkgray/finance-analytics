@@ -240,7 +240,7 @@ class TestDataQuality(unittest.TestCase):
 
         DataQuality = dataquality.DataQuality()
 
-        actual_output = DataQuality._aggregate_df_analytics(input_data)
+        actual_output = DataQuality._identify_data_gaps(input_data)
 
         pd.testing.assert_frame_equal(expected_output, actual_output)
 
@@ -254,7 +254,7 @@ class TestDataQuality(unittest.TestCase):
 
         DataQuality = dataquality.DataQuality()
 
-        actual_output = DataQuality._aggregate_df_analytics(input_data)
+        actual_output = DataQuality._identify_data_gaps(input_data)
 
         pd.testing.assert_frame_equal(expected_output, actual_output)
 
@@ -273,7 +273,7 @@ class TestDataQuality(unittest.TestCase):
 
         DataQuality = dataquality.DataQuality()
 
-        actual_output = DataQuality._aggregate_df_analytics(input_data)
+        actual_output = DataQuality._identify_data_gaps(input_data)
 
         pd.testing.assert_frame_equal(expected_output, actual_output)
 
@@ -296,7 +296,7 @@ class TestDataQuality(unittest.TestCase):
 
         DataQuality = dataquality.DataQuality()
 
-        actual_output = DataQuality._aggregate_df_analytics(input_data)
+        actual_output = DataQuality._identify_data_gaps(input_data)
 
         pd.testing.assert_frame_equal(expected_output, actual_output)
 

@@ -72,7 +72,10 @@ class DataQuality:
         :return: DataFrame listing all the missing gaps of information needed for every hierarchy detected
         """
 
-        return 0
+        compressed_data["all_gaps"] = compressed_data.apply(
+            lambda x: self.__find_missing_dates(x.min_date, x.max_date, x.all_dates), axis=1)
+
+        return compressed_data
 
     def _remove_duplicate_references(self, structured_data_with_monthstamp):
         """Removes duplicate monthstamps from a hierarchy if folder type insensitivity causes case to exist
@@ -85,3 +88,8 @@ class DataQuality:
         column_names = list(structured_data_with_monthstamp.columns)[:-2] + ['MonthStamp']
 
         return structured_data_with_monthstamp.drop_duplicates(subset=column_names, keep='first').reset_index(drop=True)
+
+    def __find_missing_dates(self, start_date, end_date, all_dates):
+        missing_daily_dates = list(pd.date_range(start_date, end_date).difference(pd.to_datetime(all_dates)).strftime('%Y-%m-%d'))
+        missing_monthly_dates = [x for x in missing_daily_dates if x[-2:] == "01"]
+        return missing_monthly_dates

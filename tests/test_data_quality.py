@@ -91,5 +91,78 @@ class TestDataQuality(unittest.TestCase):
 
         pd.testing.assert_frame_equal(expected_output, actual_output)
 
+    def test_aggregate_bank_only(self):
+
+        input_data = pd.DataFrame([["RBC", "root_folder/RBC/Statement 2000-01-06.pdf", "2000-01-01"],
+                                   ["RBC", "root_folder/RBC/Statement 2000-02-13.pdf", "2000-02-01"],
+                                   ["RBC", "root_folder/RBC/Statement 2000-04-17.pdf", "2000-04-01"],
+                                   ["TD", "root_folder/RBC/Statement 2000-01-02.pdf", "2000-01-01"],
+                                   ["TD", "root_folder/RBC/Statement 2000-02-06.pdf", "2000-02-01"],
+                                   ["TD", "root_folder/RBC/Statement 2000-03-13.pdf", "2000-03-01"],
+                                   ["TD", "root_folder/RBC/Statement 2000-04-08.pdf", "2000-04-01"]
+                                   ], columns=["Bank", "Filepath", "MonthStamp"])
+
+        expected_output = pd.DataFrame([["RBC", "2000-01-01", "2000-04-01", ["2000-01-01", "2000-02-01", "2000-04-01"]],
+                                        ["TD", "2000-01-01", "2000-04-01", ["2000-01-01", "2000-02-01", "2000-03-01", "2000-04-01"]],
+                                   ], columns=["Bank", "Filepath", "MonthStamp"])
+
+        DataQuality = dataquality.DataQuality()
+
+        actual_output = DataQuality._aggregate_df_analytics(input_data)
+
+        pd.testing.assert_frame_equal(expected_output, actual_output)
+
+    def test_aggregate_two_levels(self):
+
+        input_data = pd.DataFrame([["RBC", "A", "A-1", "unused", "1999-10-01"],
+                                   ["RBC", "A", "A-1", "unused", "1999-11-01"],
+                                   ["RBC", "A", "A-1", "unused", "2000-02-01"],
+                                   ["RBC", "A", "A-1", "unused", "2000-04-01"],
+                                   ["RBC", "A", "A-2", "unused", "2000-01-01"],
+                                   ["RBC", "A", "A-2", "unused", "2000-02-01"],
+                                   ["RBC", "A", "A-2", "unused", "2000-04-01"],
+                                   ["RBC", "B", "B-1", "unused", "2000-01-01"],
+                                   ["RBC", "B", "B-1", "unused", "2000-02-01"],
+                                   ["RBC", "B", "B-1", "unused", "2000-03-01"]
+                                   ], columns=["Bank", "Level 1", "Level 2", "Filepath", "MonthStamp"])
+
+        expected_output = pd.DataFrame([["RBC", "A", "A-1", "1999-10-01", "2000-04-01", ["1999-10-01", "1999-11-01", "2000-02-01", "2000-04-01"]],
+                                        ["RBC", "A", "A-2", "2000-01-01", "2000-04-01", ["2000-01-01", "2000-02-01", "2000-04-01"]],
+                                        ["RBC", "B", "B-1", "2000-01-01", "2000-03-01", ["2000-01-01", "2000-02-01", "2000-03-01"]]
+                                   ], columns=["Bank", "Level 1", "Level 2", "Filepath", "MonthStamp"])
+
+        DataQuality = dataquality.DataQuality()
+
+        actual_output = DataQuality._aggregate_df_analytics(input_data)
+
+        pd.testing.assert_frame_equal(expected_output, actual_output)
+
+    def test_aggregate_five_levels(self):
+
+        input_data = pd.DataFrame([["RBC", "A", "B", "C", "D", "E", "unused", "2000-01-01"],
+                                   ["RBC", "A", "B", "C", "D", "E", "unused", "2000-02-01"],
+                                   ["RBC", "A", "B", "C", "D", "E", "unused", "2000-04-01"],
+                                   ["RBC", "A", "B", "C", "D", "NONE", "unused", "2000-01-01"],
+                                   ["RBC", "A", "B", "C", "NONE", "NONE", "unused", "2000-02-01"],
+                                   ["RBC", "A", "B", "NONE", "NONE", "NONE", "unused", "2000-03-01"],
+                                   ["RBC", "A", "NONE", "NONE", "NONE", "NONE", "unused", "2000-04-01"],
+                                   ["RBC", "A", "NONE", "NONE", "NONE", "NONE", "unused", "2000-05-01"],
+                                   ["RBC", "NONE", "NONE", "NONE", "NONE", "NONE", "unused", "2000-06-01"]
+                                   ], columns=["Bank", "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Filepath", "MonthStamp"])
+
+        expected_output = pd.DataFrame([["RBC", "A", "B", "C", "D", "E", "2000-01-01", "2000-04-01", ["2000-01-01", "2000-02-01", "2000-04-01"]],
+                                        ["RBC", "A", "B", "C", "D", "NONE", "2000-01-01", "2000-01-01", ["2000-01-01"]],
+                                        ["RBC", "A", "B", "C", "NONE", "NONE", "2000-02-01", "2000-02-01", ["2000-02-01"]],
+                                        ["RBC", "A", "B", "NONE", "NONE", "NONE", "2000-03-01", "2000-03-01", ["2000-03-01"]],
+                                        ["RBC", "A", "NONE", "NONE", "NONE", "NONE", "2000-04-01", "2000-05-01", ["2000-04-01", "2000-05-01"]],
+                                        ["RBC", "NONE", "NONE", "NONE", "NONE", "NONE", "2000-06-01", "2000-06-01", ["2000-06-01"]]
+                                   ], columns=["Bank", "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Filepath", "MonthStamp"])
+
+        DataQuality = dataquality.DataQuality()
+
+        actual_output = DataQuality._aggregate_df_analytics(input_data)
+
+        pd.testing.assert_frame_equal(expected_output, actual_output)
+
 if __name__ == '__main__':
     unittest.main()

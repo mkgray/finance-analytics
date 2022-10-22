@@ -18,6 +18,8 @@ class DataQuality:
         compressed_data = self._compress_structured_data(structured_file_listing)
         data_gaps = self._identify_data_gaps(compressed_data)
 
+        self._print_diagnostics(data_gaps)
+
         logging.warning("No verbose stage included yet")
 
         return data_gaps
@@ -93,3 +95,22 @@ class DataQuality:
         missing_daily_dates = list(pd.date_range(start_date, end_date).difference(pd.to_datetime(all_dates)).strftime('%Y-%m-%d'))
         missing_monthly_dates = [x for x in missing_daily_dates if x[-2:] == "01"]
         return missing_monthly_dates
+
+    def _print_diagnostics(self, data_gaps):
+        """Prints to console the basic data quality analysis for user determination to continue or not
+
+        :param data_gaps: DataFrame listing all the missing gaps of information needed for every hierarchy detected
+        :return:
+        """
+
+        data_gaps.apply(lambda x: self.__data_quality_record_diagnostics(x), axis=1)
+
+        return 0
+    def __data_quality_record_diagnostics(x):
+        print("\n")
+        print("Hierarchy: {}".format(list(x.index[:-4])))
+        print("First Month-Year of Data: {}".format(x["min_date"]))
+        print("Last Month-Year of Data: {}".format(x["max_date"]))
+        print("Detected Month(s)-Year(s) of Data: {}".format(x["all_dates"]))
+        print("Missing Month(s)-Year(s) of Data: {}".format(x["all_gaps"]))
+        return 0

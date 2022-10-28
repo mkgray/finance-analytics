@@ -1,5 +1,6 @@
 import logging
 import pdfplumber
+import re
 import pandas as pd
 
 class StatementProcessor:
@@ -74,7 +75,48 @@ class StatementProcessor:
         # Also remove 'Amount($)' header records by removing lines with Amount containing ")"
         return merged_df[merged_df["Amount"].str.contains('\$') & ~merged_df["Amount"].str.contains("\)")]
 
+    def extract_statement_metadata(self, pdf_filepath, bank, account_type):
+        """Extracts the ending transaction year, starting balance, and ending balance for data completion.
+
+        This function extracts raw text from the first page of each statement and uses regex to pull the year of the
+        final transaction (used for analytics spanning more than one year), and the starting/ending balances (for
+        validation step after pulling all transactions)
+
+        :return:Tuple of (year, starting_balance, ending_balance)
+        """
+
+        pdf = pdfplumber.open(pdf_filepath)
+        first_page_text = pdf.pages[0].extract_text()
+
+        year_of_last_transaction = int(re.search(self.regex_statements[bank][account_type]['last_transaction_date'], first_page_text).groups()[-1])
+
+        # If starting balance regex doesn't work it is likely the opening of a new account
+        try:
+            starting_balance = float(re.search(self.regex_statements[bank][account_type]['starting_balance'], first_page_text).groups()[-1].replace("$","").replace(",", ""))
+        except:
+            starting_balance = float(0)
+
+        ending_balance = float(re.search(self.regex_statements[bank][account_type]['ending_balance'], first_page_text).groups()[-1].replace("$","").replace(",", ""))
+
+        return (year_of_last_transaction, starting_balance, ending_balance)
+
     def __init__(self):
+
+        # Store all regex statements for metadata parsing
+        self.regex_statements = {
+            'RBC': {
+                'Chequing': {
+                    'last_transaction_date':  r"From ?\w*,\w*,(\d{4})",
+                    'starting_balance': r"Your ?opening ?balance ?on ?\w*, ?\d* ?(-?\$?.*)",
+                    'ending_balance': r"Your ?closing ?balance ?on ?\w*, ?\d* ?=?(-?\$?.*)",
+                },
+                'Visa': {
+                    'last_transaction_date': r"STATEMENT ?FROM ?\w*,(\d{4})",
+                    'starting_balance': r"PREVIOUS ?STATEMENT ?BALANCE ?(-?\$?[0-9,.]*)",
+                    'ending_balance': r"(CREDIT ?BALANCE ?|NEW ?BALANCE ?)(-?\$?[0-9,.]*)",
+                }
+            }
+        }
 
         # Hard coded based on trial and error for now
         self.rbc_chequing_table_settings_odd_pages = {

@@ -1,6 +1,8 @@
+import datetime
 import logging
 import pdfplumber
 import re
+import numpy as np
 import pandas as pd
 
 class StatementProcessor:
@@ -74,6 +76,64 @@ class StatementProcessor:
         # Remove all records without a "$" in amount to remove non-transaction lines
         # Also remove 'Amount($)' header records by removing lines with Amount containing ")"
         return merged_df[merged_df["Amount"].str.contains('\$') & ~merged_df["Amount"].str.contains("\)")]
+
+    def standardized_rbc_visa_transactions(self, transactions, year_of_last_transaction):
+        """Converts extract of rbc visa to a standard format for aggregation and analysis
+
+        :param transactions: The DataFrame of transactions pulled from an rbc visa statement
+        :param year_of_last_transaction: The year that the statement ends for
+        :return: DataFrame of transactions in common format
+        """
+
+        column_mapping = {
+            "Transaction Date": "Date",
+            "Activity Description": "Description",
+            "Amount": "Amount",
+        }
+
+        # Standardize column names and strip the non-standard columns
+        # Drop records that have no date (visa no date indicates balance statements)
+        transactions.rename(columns=column_mapping, inplace=True)
+        standard_column_df = transactions[column_mapping.values()].replace('', np.nan).dropna(subset=["Date"])
+
+        # Convert amounts to float
+        standard_column_df["Amount"] = standard_column_df["Amount"].apply(lambda x: float(x.replace('$', '').replace(',', '')))
+
+        # Convert Date to datestamp
+        standard_column_df["Date"] = standard_column_df["Date"].apply(lambda x: self._convert_date_to_datestamps(x, year_of_last_transaction))
+
+        # If transactions for the statement include January, then the month period includes rollover and Dec must be adjusted one year back
+        if any(standard_column_df["Date"].dt.month == 1):
+            standard_column_df.loc[standard_column_df["Date"].dt.month==12, "Date"] = standard_column_df[standard_column_df["Date"].dt.month==12]["Date"] - pd.DateOffset(years=1)
+
+        return standard_column_df.reset_index(drop=True)
+
+    def _convert_date_to_datestamps(self, date_string, year):
+        """Converts MMMDD statement transaction date format to string
+
+        :param date_string: String containing transaction date as MMMDD using abbreviated month name
+        :param year: The year to tag to the transaction
+        :return: Datetime type of the transaction date
+        """
+
+        month_mapping = {
+            "JAN": "01",
+            "FEB": "02",
+            "MAR": "03",
+            "APR": "04",
+            "MAY": "05",
+            "JUN": "06",
+            "JUL": "07",
+            "AUG": "08",
+            "SEP": "09",
+            "OCT": "10",
+            "NOV": "11",
+            "DEC": "12",
+        }
+
+        # Split into pieces and join as a single string for conversion
+        return datetime.datetime.strptime('-'.join((str(year), month_mapping[date_string[:3]], date_string[-2:])), '%Y-%m-%d')
+
 
     def extract_statement_metadata(self, pdf_filepath, bank, account_type):
         """Extracts the ending transaction year, starting balance, and ending balance for data completion.

@@ -5,6 +5,43 @@ import pandas as pd
 
 class TestStatementProcessor(unittest.TestCase):
 
+    def test_standardize_rbc_chequing_example_1(self):
+        input_data = pd.DataFrame([["", "OpeningBalance", "", "", "1111.11"],
+                                   ["12Aug", "Interacpurchase-9999 TEST-CO", "222.22", "", "888.89"],
+                                   ["", "ContactlessInteracpurchase-9999\nBATTLEBOX-SQU", "11.11", "", "877.78"],
+                                   ["13Aug", "BIGMONEY-NOWHAMMIES", "", "1000.00", ""],
+                                   ["", "ContactlessInteracpurchase-9999\nSTARBUCKS#1234", "11.11", "", "1866.67"],
+                                   ["26Aug", "BillPayment BIGBILLS", "11.11", "", "1855.56"],
+                                   ["4Sep", "Interacpurchase-7777 BIGBOXSTORE#", "22.22", "", ""],
+                                   ["", "Interacpurchase-4444 ABCD/EFG#1234", "33.33", "", "1800.01"],
+                                   ["", "ContactlessInteracpurchase-8888\nKRUSTYKREME#1", "44.44", "", ""],
+                                   ["", "ContactlessInteracpurchase-9876\nTHESTEERSTORE", "55.55", "", "1700.02"],
+                                   ["11Sep", "ContactlessInteracpurchase-1234\nTABLEROCKLOBSTER", "6.66", "", ""],
+                                   ["", "ContactlessInteracpurchase-1111\nKARTHOUSE", "7.77", "", "1685.59"]],
+                                  columns=["Date", "Description", "Withdrawl", "Deposits", "Balance"])
+
+        input_year = int(2020)
+
+        expected_output = pd.DataFrame(
+            [[datetime.datetime.strptime("2020-08-12", '%Y-%m-%d'), "Interacpurchase-9999 TEST-CO", -222.22],
+             [datetime.datetime.strptime("2020-08-12", '%Y-%m-%d'), "ContactlessInteracpurchase-9999\nBATTLEBOX-SQU", -11.11],
+             [datetime.datetime.strptime("2020-08-13", '%Y-%m-%d'), "BIGMONEY-NOWHAMMIES", 1000.00],
+             [datetime.datetime.strptime("2020-08-13", '%Y-%m-%d'), "ContactlessInteracpurchase-9999\nSTARBUCKS#1234", -11.11],
+             [datetime.datetime.strptime("2020-08-26", '%Y-%m-%d'), "BillPayment BIGBILLS", -11.11],
+             [datetime.datetime.strptime("2020-09-04", '%Y-%m-%d'), "Interacpurchase-7777 BIGBOXSTORE#", -22.22],
+             [datetime.datetime.strptime("2020-09-04", '%Y-%m-%d'), "Interacpurchase-4444 ABCD/EFG#1234", -33.33],
+             [datetime.datetime.strptime("2020-09-04", '%Y-%m-%d'), "ContactlessInteracpurchase-8888\nKRUSTYKREME#1", -44.44],
+             [datetime.datetime.strptime("2020-09-04", '%Y-%m-%d'), "ContactlessInteracpurchase-9876\nTHESTEERSTORE", -55.55],
+             [datetime.datetime.strptime("2020-09-11", '%Y-%m-%d'), "ContactlessInteracpurchase-1234\nTABLEROCKLOBSTER", -6.66],
+             [datetime.datetime.strptime("2020-09-11", '%Y-%m-%d'), "ContactlessInteracpurchase-1111\nKARTHOUSE", -7.77]],
+            columns=["Date", "Description", "Amount"])
+
+        StatementProcessor = statementprocessor.StatementProcessor()
+
+        actual_output = StatementProcessor.standardized_rbc_chequing_transactions(input_data, input_year)
+
+        pd.testing.assert_frame_equal(expected_output, actual_output)
+
     def test_standardize_rbc_visa_example_1(self):
         input_data = pd.DataFrame([["JUN13", "JUN14", "AMAZON.CA*AB1CD23E4AMAZON.CAON", "$11.11"],
                                    ["JUN13", "JUN13", "TIMHORTONS#9999555-555-5555ON", "$2.22"],

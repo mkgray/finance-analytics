@@ -77,6 +77,49 @@ class StatementProcessor:
         # Also remove 'Amount($)' header records by removing lines with Amount containing ")"
         return merged_df[merged_df["Amount"].str.contains('\$') & ~merged_df["Amount"].str.contains("\)")]
 
+    def standardized_rbc_chequing_transactions(self, transactions, year_of_last_transaction):
+        """Converts extract of rbc chequing to a standard format for aggregation and analysis
+
+        :param transactions: The DataFrame of transactions pulled from an rbc visa statement
+        :param year_of_last_transaction: The year that the statement ends for
+        :return: DataFrame of transactions in common format
+        """
+
+        column_mapping = {
+            "Date": "Date",
+            "Description": "Description",
+            "Amount": "Amount",
+        }
+
+        # Remove records without either a deposit or a withdrawl
+        transactions = transactions[~(((transactions["Deposits"]=="")|(transactions["Deposits"].isna()))
+                                      &((transactions["Withdrawl"]=="")|(transactions["Withdrawl"].isna())))]
+
+        # Propagate dates when multiple transactions occur on same day
+        transactions["Date"] = transactions["Date"].replace("", np.nan).ffill(axis=0)
+
+        # Merge withdrawls and deposits into one column
+        transactions["Deposits"] = transactions["Deposits"].replace("", np.nan).fillna(0).astype(float)
+        transactions["Withdrawl"] = transactions["Withdrawl"].replace("", np.nan).fillna(0).astype(float)
+        transactions["Amount"] = transactions["Deposits"] - transactions["Withdrawl"]
+
+        # Extract relevant columns
+        transactions.rename(columns=column_mapping, inplace=True)
+        standard_column_df = transactions[column_mapping.values()].replace('', np.nan).dropna(subset=["Date"])
+
+        # Prepare Date to match style of standard input for conversion to datetime object
+        standard_column_df["Date"] = standard_column_df["Date"].apply(lambda x:"".join((x[-3:].upper(), x[:-3].zfill(2))))
+
+        # Convert Date to datestamp
+        standard_column_df["Date"] = standard_column_df["Date"].apply(lambda x: self._convert_date_to_datestamps(x, year_of_last_transaction))
+
+        # If transactions for the statement include January, then the month period includes rollover and Dec must be adjusted one year back
+        if any(standard_column_df["Date"].dt.month == 1):
+            standard_column_df.loc[standard_column_df["Date"].dt.month == 12, "Date"] = \
+            standard_column_df[standard_column_df["Date"].dt.month == 12]["Date"] - pd.DateOffset(years=1)
+
+        return standard_column_df.reset_index(drop=True)
+
     def standardized_rbc_visa_transactions(self, transactions, year_of_last_transaction):
         """Converts extract of rbc visa to a standard format for aggregation and analysis
 

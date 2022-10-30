@@ -77,7 +77,7 @@ class StatementProcessor:
         # Also remove 'Amount($)' header records by removing lines with Amount containing ")"
         return merged_df[merged_df["Amount"].str.contains('\$') & ~merged_df["Amount"].str.contains("\)")]
 
-    def standardized_rbc_chequing_transactions(self, transactions, year_of_last_transaction):
+    def standardized_rbc_chequing_transactions(self, transaction_df, year_of_last_transaction):
         """Converts extract of rbc chequing to a standard format for aggregation and analysis
 
         :param transactions: The DataFrame of transactions pulled from an rbc visa statement
@@ -90,6 +90,9 @@ class StatementProcessor:
             "Description": "Description",
             "Amount": "Amount",
         }
+
+        # Used for safety in df manipulation
+        transactions = transaction_df.copy(deep=True)
 
         # Remove records without either a deposit or a withdrawl
         transactions = transactions[~(((transactions["Deposits"]=="")|(transactions["Deposits"].isna()))

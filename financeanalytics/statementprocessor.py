@@ -85,12 +85,6 @@ class StatementProcessor:
         :return: DataFrame of transactions in common format
         """
 
-        column_mapping = {
-            "Date": "Date",
-            "Description": "Description",
-            "Amount": "Amount",
-        }
-
         # Used for safety in df manipulation
         transactions = transaction_df.copy(deep=True)
 
@@ -107,8 +101,7 @@ class StatementProcessor:
         transactions["Amount"] = transactions["Deposits"] - transactions["Withdrawl"]
 
         # Extract relevant columns
-        transactions.rename(columns=column_mapping, inplace=True)
-        standard_column_df = transactions[column_mapping.values()].replace('', np.nan).dropna(subset=["Date"])
+        standard_column_df = self._standardize_preprocessed_table(transactions,self.column_mapping_for_standardization['RBC']['Chequing'])
 
         # Prepare Date to match style of standard input for conversion to datetime object
         standard_column_df["Date"] = standard_column_df["Date"].apply(lambda x:"".join((x[-3:].upper(), x[:-3].zfill(2))))
@@ -131,16 +124,7 @@ class StatementProcessor:
         :return: DataFrame of transactions in common format
         """
 
-        column_mapping = {
-            "Transaction Date": "Date",
-            "Activity Description": "Description",
-            "Amount": "Amount",
-        }
-
-        # Standardize column names and strip the non-standard columns
-        # Drop records that have no date (visa no date indicates balance statements)
-        transactions.rename(columns=column_mapping, inplace=True)
-        standard_column_df = transactions[column_mapping.values()].replace('', np.nan).dropna(subset=["Date"])
+        standard_column_df = self._standardize_preprocessed_table(transactions, self.column_mapping_for_standardization['RBC']['Visa'])
 
         # Convert amounts to float
         standard_column_df["Amount"] = standard_column_df["Amount"].apply(lambda x: float(x.replace('$', '').replace(',', '')))
@@ -153,6 +137,40 @@ class StatementProcessor:
             standard_column_df.loc[standard_column_df["Date"].dt.month==12, "Date"] = standard_column_df[standard_column_df["Date"].dt.month==12]["Date"] - pd.DateOffset(years=1)
 
         return standard_column_df.reset_index(drop=True)
+
+    def _standardize_preprocessed_table(self, transactions, column_mapping):
+        """Performs all standardization methods from Bank statement DataFrames that have been preprocesses to easily streamline standardization.
+
+        Standardized preprocessed tables include mapping and filtering for only columns included in the standard table for downstream analysis, as well as removal of records that contain empty date values
+
+        :param transactions: Preprocessed Bank statement DataFrame
+        :param column_mapping: Dictionary which maps the columns in the Bank statement to standard columns, typically comes from the class mapping dict
+        :return: DataFrame with column-level filtering to only pass mapped columns and row-level filtering for only transactions with dates
+        """
+
+        return self._drop_records_without_date(self._standardize_columns_in_df(transactions, column_mapping))
+
+    def _standardize_columns_in_df(self, transactions, column_mapping):
+        """Maps different bank statement fields to the standard fields for analysis.
+        Also removes all non-standardized fields to reduce complexity of downstream handling
+
+        :param transactions:Listing of all transactions from any Bank statement
+        :param column_mapping:Mapping of which fields for this Bank statement map to the standard fields
+        :return:DataFrame with no record level filtering, but column filtering for standardized DataFrame output
+        """
+        transactions.rename(columns=column_mapping, inplace=True)
+
+        return transactions[column_mapping.values()]
+
+    def _drop_records_without_date(self, transactions):
+        """Filters records without a Date
+
+        :param transactions:DataFrame of transactions on standard column schema
+        :return:DataFrame filtered for only records with a Date
+        """
+
+        # Drop records that have no date (visa no date indicates balance statements)
+        return transactions.replace('', np.nan).dropna(subset=["Date"]).reset_index(drop=True)
 
     def _convert_date_to_datestamps(self, date_string, year):
         """Converts MMMDD statement transaction date format to string
@@ -220,6 +238,21 @@ class StatementProcessor:
                     'last_transaction_date': r"STATEMENT ?FROM ?\w*,(\d{4})",
                     'starting_balance': r"PREVIOUS ?STATEMENT ?BALANCE ?(-?\$?[0-9,.]*)",
                     'ending_balance': r"(CREDIT ?BALANCE ?|NEW ?BALANCE ?)(-?\$?[0-9,.]*)",
+                }
+            }
+        }
+
+        self.column_mapping_for_standardization = {
+            'RBC': {
+                'Chequing': {
+                    "Date": "Date",
+                    "Description": "Description",
+                    "Amount": "Amount",
+                },
+                'Visa': {
+                    "Transaction Date": "Date",
+                    "Activity Description": "Description",
+                    "Amount": "Amount",
                 }
             }
         }

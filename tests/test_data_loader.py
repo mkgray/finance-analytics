@@ -7,15 +7,15 @@ class TestDataLoader(unittest.TestCase):
 
     def test_file_recognition(self):
         # Intended to be run on the main project folder, not compatible with running in different working path
-        expected_files = ["tests/detection_test/RBC/Chequing/empty.pdf",
-                          "tests/detection_test/RBC/V1sa/empty.pdf",
-                          "tests/detection_test/TD/Checking/empty.pdf",
-                          "tests/detection_test/TD/Visa/empty.pdf"]
+        expected_files = ["detection_test/RBC/Chequing/empty.pdf",
+                          "detection_test/RBC/V1sa/empty.pdf",
+                          "detection_test/TD/Checking/empty.pdf",
+                          "detection_test/TD/Visa/empty.pdf"]
         expected_output = [Path(x) for x in expected_files]
 
         DataLoader = dataloader.DataLoader()
 
-        root_folder = "tests/detection_test"
+        root_folder = "detection_test"
 
         actual_output = DataLoader._detect_relevant_files(root_folder)
 

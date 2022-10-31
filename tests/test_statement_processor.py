@@ -318,5 +318,135 @@ class TestStatementProcessor(unittest.TestCase):
 
         self.assertTrue('day is out of range for month' in str(context.exception))
 
+    def test_adjust_dates_for_rollover_example_1(self):
+        input_data = pd.DataFrame(
+            [[datetime.datetime.strptime("2020-08-12", '%Y-%m-%d'), "Interacpurchase-9999 TEST-CO", -222.22],
+             [datetime.datetime.strptime("2020-08-12", '%Y-%m-%d'), "ContactlessInteracpurchase-9999\nBATTLEBOX-SQU", -11.11],
+             [datetime.datetime.strptime("2020-08-13", '%Y-%m-%d'), "BIGMONEY-NOWHAMMIES", 1000.00],
+             [datetime.datetime.strptime("2020-08-13", '%Y-%m-%d'), "ContactlessInteracpurchase-9999\nSTARBUCKS#1234", -11.11],
+             [datetime.datetime.strptime("2020-08-26", '%Y-%m-%d'), "BillPayment BIGBILLS", -11.11],
+             [datetime.datetime.strptime("2020-09-04", '%Y-%m-%d'), "Interacpurchase-7777 BIGBOXSTORE#", -22.22],
+             [datetime.datetime.strptime("2020-09-04", '%Y-%m-%d'), "Interacpurchase-4444 ABCD/EFG#1234", -33.33],
+             [datetime.datetime.strptime("2020-09-04", '%Y-%m-%d'), "ContactlessInteracpurchase-8888\nKRUSTYKREME#1", -44.44],
+             [datetime.datetime.strptime("2020-09-04", '%Y-%m-%d'), "ContactlessInteracpurchase-9876\nTHESTEERSTORE", -55.55],
+             [datetime.datetime.strptime("2020-09-11", '%Y-%m-%d'), "ContactlessInteracpurchase-1234\nTABLEROCKLOBSTER", -6.66],
+             [datetime.datetime.strptime("2020-09-11", '%Y-%m-%d'), "ContactlessInteracpurchase-1111\nKARTHOUSE", -7.77]],
+            columns=["Date", "Description", "Amount"])
+
+        expected_output = pd.DataFrame(
+            [[datetime.datetime.strptime("2020-08-12", '%Y-%m-%d'), "Interacpurchase-9999 TEST-CO", -222.22],
+             [datetime.datetime.strptime("2020-08-12", '%Y-%m-%d'), "ContactlessInteracpurchase-9999\nBATTLEBOX-SQU", -11.11],
+             [datetime.datetime.strptime("2020-08-13", '%Y-%m-%d'), "BIGMONEY-NOWHAMMIES", 1000.00],
+             [datetime.datetime.strptime("2020-08-13", '%Y-%m-%d'), "ContactlessInteracpurchase-9999\nSTARBUCKS#1234", -11.11],
+             [datetime.datetime.strptime("2020-08-26", '%Y-%m-%d'), "BillPayment BIGBILLS", -11.11],
+             [datetime.datetime.strptime("2020-09-04", '%Y-%m-%d'), "Interacpurchase-7777 BIGBOXSTORE#", -22.22],
+             [datetime.datetime.strptime("2020-09-04", '%Y-%m-%d'), "Interacpurchase-4444 ABCD/EFG#1234", -33.33],
+             [datetime.datetime.strptime("2020-09-04", '%Y-%m-%d'), "ContactlessInteracpurchase-8888\nKRUSTYKREME#1", -44.44],
+             [datetime.datetime.strptime("2020-09-04", '%Y-%m-%d'), "ContactlessInteracpurchase-9876\nTHESTEERSTORE", -55.55],
+             [datetime.datetime.strptime("2020-09-11", '%Y-%m-%d'), "ContactlessInteracpurchase-1234\nTABLEROCKLOBSTER", -6.66],
+             [datetime.datetime.strptime("2020-09-11", '%Y-%m-%d'), "ContactlessInteracpurchase-1111\nKARTHOUSE", -7.77]],
+            columns=["Date", "Description", "Amount"])
+
+        StatementProcessor = statementprocessor.StatementProcessor()
+
+        actual_output = StatementProcessor._adjust_dates_for_rollover(input_data)
+
+        pd.testing.assert_frame_equal(expected_output, actual_output)
+
+    def test_adjust_dates_for_rollover_example_2(self):
+        input_data = pd.DataFrame(
+            [[datetime.datetime.strptime("2020-12-12", '%Y-%m-%d'), "Interacpurchase-9999 TEST-CO", -222.22],
+             [datetime.datetime.strptime("2020-12-12", '%Y-%m-%d'), "ContactlessInteracpurchase-9999\nBATTLEBOX-SQU", -11.11],
+             [datetime.datetime.strptime("2020-12-13", '%Y-%m-%d'), "BIGMONEY-NOWHAMMIES", 1000.00],
+             [datetime.datetime.strptime("2020-12-13", '%Y-%m-%d'), "ContactlessInteracpurchase-9999\nSTARBUCKS#1234", -11.11],
+             [datetime.datetime.strptime("2020-12-26", '%Y-%m-%d'), "BillPayment BIGBILLS", -11.11],
+             [datetime.datetime.strptime("2020-01-04", '%Y-%m-%d'), "Interacpurchase-7777 BIGBOXSTORE#", -22.22],
+             [datetime.datetime.strptime("2020-01-04", '%Y-%m-%d'), "Interacpurchase-4444 ABCD/EFG#1234", -33.33],
+             [datetime.datetime.strptime("2020-01-04", '%Y-%m-%d'), "ContactlessInteracpurchase-8888\nKRUSTYKREME#1", -44.44],
+             [datetime.datetime.strptime("2020-01-04", '%Y-%m-%d'), "ContactlessInteracpurchase-9876\nTHESTEERSTORE", -55.55],
+             [datetime.datetime.strptime("2020-01-11", '%Y-%m-%d'), "ContactlessInteracpurchase-1234\nTABLEROCKLOBSTER", -6.66],
+             [datetime.datetime.strptime("2020-01-11", '%Y-%m-%d'), "ContactlessInteracpurchase-1111\nKARTHOUSE", -7.77]],
+            columns=["Date", "Description", "Amount"])
+
+        expected_output = pd.DataFrame(
+            [[datetime.datetime.strptime("2019-12-12", '%Y-%m-%d'), "Interacpurchase-9999 TEST-CO", -222.22],
+             [datetime.datetime.strptime("2019-12-12", '%Y-%m-%d'), "ContactlessInteracpurchase-9999\nBATTLEBOX-SQU", -11.11],
+             [datetime.datetime.strptime("2019-12-13", '%Y-%m-%d'), "BIGMONEY-NOWHAMMIES", 1000.00],
+             [datetime.datetime.strptime("2019-12-13", '%Y-%m-%d'), "ContactlessInteracpurchase-9999\nSTARBUCKS#1234", -11.11],
+             [datetime.datetime.strptime("2019-12-26", '%Y-%m-%d'), "BillPayment BIGBILLS", -11.11],
+             [datetime.datetime.strptime("2020-01-04", '%Y-%m-%d'), "Interacpurchase-7777 BIGBOXSTORE#", -22.22],
+             [datetime.datetime.strptime("2020-01-04", '%Y-%m-%d'), "Interacpurchase-4444 ABCD/EFG#1234", -33.33],
+             [datetime.datetime.strptime("2020-01-04", '%Y-%m-%d'), "ContactlessInteracpurchase-8888\nKRUSTYKREME#1", -44.44],
+             [datetime.datetime.strptime("2020-01-04", '%Y-%m-%d'), "ContactlessInteracpurchase-9876\nTHESTEERSTORE", -55.55],
+             [datetime.datetime.strptime("2020-01-11", '%Y-%m-%d'), "ContactlessInteracpurchase-1234\nTABLEROCKLOBSTER", -6.66],
+             [datetime.datetime.strptime("2020-01-11", '%Y-%m-%d'), "ContactlessInteracpurchase-1111\nKARTHOUSE", -7.77]],
+            columns=["Date", "Description", "Amount"])
+
+        StatementProcessor = statementprocessor.StatementProcessor()
+
+        actual_output = StatementProcessor._adjust_dates_for_rollover(input_data)
+
+        pd.testing.assert_frame_equal(expected_output, actual_output)
+
+    def test_standardize_date_columns_year_rollover(self):
+        input_data = pd.DataFrame([["DEC13", "AMAZON.CA*AB1CD23E4AMAZON.CAON", 11.11],
+                                   ["DEC13", "TIMHORTONS#9999555-555-5555ON", 2.22],
+                                   ["DEC14", "UBER*EATSTORONTOON", 99.99],
+                                   ["DEC16", "UBERCANADA/UBEREATSTORONTOON", 11.11],
+                                   ["DEC16", "PETROCAN-1TAUNTONRDNTORONTOON", 22.22],
+                                   ["DEC17", "MCDONALD'S12345TORONTOON", 3.33],
+                                   ["DEC24", "PAYMENT-THANKYOU/PAIEMENT-MERCI", -1000.00],
+                                   ["JAN03", "UBERCANADA/UBEREATSTORONTOON", 66.66]],
+                                  columns=["Date", "Description", "Amount"])
+
+        input_year = int(2020)
+
+        expected_output = pd.DataFrame(
+            [[datetime.datetime.strptime("2019-12-13", '%Y-%m-%d'), "AMAZON.CA*AB1CD23E4AMAZON.CAON", 11.11],
+               [datetime.datetime.strptime("2019-12-13", '%Y-%m-%d'), "TIMHORTONS#9999555-555-5555ON", 2.22],
+               [datetime.datetime.strptime("2019-12-14", '%Y-%m-%d'), "UBER*EATSTORONTOON", 99.99],
+               [datetime.datetime.strptime("2019-12-16", '%Y-%m-%d'), "UBERCANADA/UBEREATSTORONTOON", 11.11],
+               [datetime.datetime.strptime("2019-12-16", '%Y-%m-%d'), "PETROCAN-1TAUNTONRDNTORONTOON", 22.22],
+               [datetime.datetime.strptime("2019-12-17", '%Y-%m-%d'), "MCDONALD'S12345TORONTOON", 3.33],
+               [datetime.datetime.strptime("2019-12-24", '%Y-%m-%d'), "PAYMENT-THANKYOU/PAIEMENT-MERCI", -1000.00],
+               [datetime.datetime.strptime("2020-01-03", '%Y-%m-%d'), "UBERCANADA/UBEREATSTORONTOON", 66.66]],
+              columns=["Date", "Description", "Amount"])
+
+        StatementProcessor = statementprocessor.StatementProcessor()
+
+        actual_output = StatementProcessor._standardize_date_columns(input_data, input_year)
+
+        pd.testing.assert_frame_equal(expected_output, actual_output)
+
+    def test_standardize_date_columns_no_year_rollover(self):
+        input_data = pd.DataFrame([["NOV13", "AMAZON.CA*AB1CD23E4AMAZON.CAON", 11.11],
+                                   ["NOV13", "TIMHORTONS#9999555-555-5555ON", 2.22],
+                                   ["NOV14", "UBER*EATSTORONTOON", 99.99],
+                                   ["NOV16", "UBERCANADA/UBEREATSTORONTOON", 11.11],
+                                   ["NOV16", "PETROCAN-1TAUNTONRDNTORONTOON", 22.22],
+                                   ["NOV17", "MCDONALD'S12345TORONTOON", 3.33],
+                                   ["NOV24", "PAYMENT-THANKYOU/PAIEMENT-MERCI", -1000.00],
+                                   ["DEC03", "UBERCANADA/UBEREATSTORONTOON", 66.66]],
+                                  columns=["Date", "Description", "Amount"])
+
+        input_year = int(2020)
+
+        expected_output = pd.DataFrame(
+            [[datetime.datetime.strptime("2020-11-13", '%Y-%m-%d'), "AMAZON.CA*AB1CD23E4AMAZON.CAON", 11.11],
+               [datetime.datetime.strptime("2020-11-13", '%Y-%m-%d'), "TIMHORTONS#9999555-555-5555ON", 2.22],
+               [datetime.datetime.strptime("2020-11-14", '%Y-%m-%d'), "UBER*EATSTORONTOON", 99.99],
+               [datetime.datetime.strptime("2020-11-16", '%Y-%m-%d'), "UBERCANADA/UBEREATSTORONTOON", 11.11],
+               [datetime.datetime.strptime("2020-11-16", '%Y-%m-%d'), "PETROCAN-1TAUNTONRDNTORONTOON", 22.22],
+               [datetime.datetime.strptime("2020-11-17", '%Y-%m-%d'), "MCDONALD'S12345TORONTOON", 3.33],
+               [datetime.datetime.strptime("2020-11-24", '%Y-%m-%d'), "PAYMENT-THANKYOU/PAIEMENT-MERCI", -1000.00],
+               [datetime.datetime.strptime("2020-12-03", '%Y-%m-%d'), "UBERCANADA/UBEREATSTORONTOON", 66.66]],
+              columns=["Date", "Description", "Amount"])
+
+        StatementProcessor = statementprocessor.StatementProcessor()
+
+        actual_output = StatementProcessor._standardize_date_columns(input_data, input_year)
+
+        pd.testing.assert_frame_equal(expected_output, actual_output)
+
 if __name__ == '__main__':
     unittest.main()

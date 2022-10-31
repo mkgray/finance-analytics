@@ -106,15 +106,32 @@ class StatementProcessor:
         # Prepare Date to match style of standard input for conversion to datetime object
         standard_column_df["Date"] = standard_column_df["Date"].apply(lambda x:"".join((x[-3:].upper(), x[:-3].zfill(2))))
 
-        # Convert Date to datestamp
-        standard_column_df["Date"] = standard_column_df["Date"].apply(lambda x: self._convert_date_to_datestamps(x, year_of_last_transaction))
-
         # If transactions for the statement include January, then the month period includes rollover and Dec must be adjusted one year back
+        return self._standardize_date_columns(standard_column_df, year_of_last_transaction).reset_index(drop=True)
+
+    def _standardize_date_columns(self, transactions, year_of_last_transaction):
+        """Converts 'JAN01'-like dates to datetime objects and compensates for statements that roll the year over
+
+        :param transactions: List of transactions with Date field set up like 'JAN01'
+        :param year_of_last_transaction: The integer year of the last transaction in the statement
+        :return: DataFrame with Date column as datetime
+        """
+
+        transactions["Date"] = transactions["Date"].apply(lambda x: self._convert_date_to_datestamps(x, year_of_last_transaction))
+
+        return self._adjust_dates_for_rollover(transactions)
+
+    def _adjust_dates_for_rollover(self, standard_column_df):
+        """Adjust December dates back one year if the statement includes January transactions
+
+        :param dates: The pandas Series list of all dates
+        :return: A pandas Series with December dates shifted one year back if last transaction includes January month
+        """
         if any(standard_column_df["Date"].dt.month == 1):
             standard_column_df.loc[standard_column_df["Date"].dt.month == 12, "Date"] = \
             standard_column_df[standard_column_df["Date"].dt.month == 12]["Date"] - pd.DateOffset(years=1)
 
-        return standard_column_df.reset_index(drop=True)
+        return standard_column_df
 
     def standardized_rbc_visa_transactions(self, transactions, year_of_last_transaction):
         """Converts extract of rbc visa to a standard format for aggregation and analysis
@@ -129,14 +146,8 @@ class StatementProcessor:
         # Convert amounts to float
         standard_column_df["Amount"] = standard_column_df["Amount"].apply(lambda x: float(x.replace('$', '').replace(',', '')))
 
-        # Convert Date to datestamp
-        standard_column_df["Date"] = standard_column_df["Date"].apply(lambda x: self._convert_date_to_datestamps(x, year_of_last_transaction))
-
         # If transactions for the statement include January, then the month period includes rollover and Dec must be adjusted one year back
-        if any(standard_column_df["Date"].dt.month == 1):
-            standard_column_df.loc[standard_column_df["Date"].dt.month==12, "Date"] = standard_column_df[standard_column_df["Date"].dt.month==12]["Date"] - pd.DateOffset(years=1)
-
-        return standard_column_df.reset_index(drop=True)
+        return self._standardize_date_columns(standard_column_df, year_of_last_transaction).reset_index(drop=True)
 
     def _standardize_preprocessed_table(self, transactions, column_mapping):
         """Performs all standardization methods from Bank statement DataFrames that have been preprocesses to easily streamline standardization.

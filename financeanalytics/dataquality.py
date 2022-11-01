@@ -106,7 +106,7 @@ class DataQuality:
         data_gaps.apply(lambda x: self.__data_quality_record_diagnostics(x), axis=1)
 
         return 0
-    def __data_quality_record_diagnostics(x):
+    def __data_quality_record_diagnostics(self, x):
         print("\n")
         print("Hierarchy: {}".format(list(x.index[:-4])))
         print("First Month-Year of Data: {}".format(x["min_date"]))

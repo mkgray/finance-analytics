@@ -448,5 +448,46 @@ class TestStatementProcessor(unittest.TestCase):
 
         pd.testing.assert_frame_equal(expected_output, actual_output)
 
+    def test_validate_transactions_successful_visa(self):
+        input_data = pd.DataFrame(
+            [[datetime.datetime.strptime("2020-11-13", '%Y-%m-%d'), "AMAZON.CA*AB1CD23E4AMAZON.CAON", 11.11],
+               [datetime.datetime.strptime("2020-11-13", '%Y-%m-%d'), "TIMHORTONS#9999555-555-5555ON", 2.22],
+               [datetime.datetime.strptime("2020-11-14", '%Y-%m-%d'), "UBER*EATSTORONTOON", 99.99],
+               [datetime.datetime.strptime("2020-11-16", '%Y-%m-%d'), "UBERCANADA/UBEREATSTORONTOON", 11.11],
+               [datetime.datetime.strptime("2020-11-16", '%Y-%m-%d'), "PETROCAN-1TAUNTONRDNTORONTOON", 22.22],
+               [datetime.datetime.strptime("2020-11-17", '%Y-%m-%d'), "MCDONALD'S12345TORONTOON", 3.33],
+               [datetime.datetime.strptime("2020-11-24", '%Y-%m-%d'), "PAYMENT-THANKYOU/PAIEMENT-MERCI", -1000.00],
+               [datetime.datetime.strptime("2020-12-03", '%Y-%m-%d'), "UBERCANADA/UBEREATSTORONTOON", 66.66]],
+              columns=["Date", "Description", "Amount"])
+
+        opening_balance = float(500.00)
+        closing_balance = float(-283.36)
+
+        StatementProcessor = statementprocessor.StatementProcessor()
+
+        self.assertTrue(StatementProcessor.validate_transactions(input_data, opening_balance, closing_balance))
+
+    def test_validate_transaction_successful_chequing(self):
+        input_data = pd.DataFrame(
+            [[datetime.datetime.strptime("2019-12-12", '%Y-%m-%d'), "Interacpurchase-9999 TEST-CO", -222.22],
+             [datetime.datetime.strptime("2019-12-12", '%Y-%m-%d'), "ContactlessInteracpurchase-9999\nBATTLEBOX-SQU", -11.11],
+             [datetime.datetime.strptime("2019-12-13", '%Y-%m-%d'), "BIGMONEY-NOWHAMMIES", 1000.00],
+             [datetime.datetime.strptime("2019-12-13", '%Y-%m-%d'), "ContactlessInteracpurchase-9999\nSTARBUCKS#1234", -11.11],
+             [datetime.datetime.strptime("2019-12-26", '%Y-%m-%d'), "BillPayment BIGBILLS", -11.11],
+             [datetime.datetime.strptime("2020-01-04", '%Y-%m-%d'), "Interacpurchase-7777 BIGBOXSTORE#", -22.22],
+             [datetime.datetime.strptime("2020-01-04", '%Y-%m-%d'), "Interacpurchase-4444 ABCD/EFG#1234", -33.33],
+             [datetime.datetime.strptime("2020-01-04", '%Y-%m-%d'), "ContactlessInteracpurchase-8888\nKRUSTYKREME#1", -44.44],
+             [datetime.datetime.strptime("2020-01-04", '%Y-%m-%d'), "ContactlessInteracpurchase-9876\nTHESTEERSTORE", -55.55],
+             [datetime.datetime.strptime("2020-01-11", '%Y-%m-%d'), "ContactlessInteracpurchase-1234\nTABLEROCKLOBSTER", -6.66],
+             [datetime.datetime.strptime("2020-01-11", '%Y-%m-%d'), "ContactlessInteracpurchase-1111\nKARTHOUSE", -7.77]],
+            columns=["Date", "Description", "Amount"])
+
+        opening_balance = float(500.00)
+        closing_balance = float(1074.48)
+
+        StatementProcessor = statementprocessor.StatementProcessor()
+
+        self.assertTrue(StatementProcessor.validate_transactions(input_data, opening_balance, closing_balance))
+
 if __name__ == '__main__':
     unittest.main()

@@ -10,6 +10,52 @@ class StatementProcessor:
     A class used to actually convert Bank pdf statements to text for downstream processing.
     """
 
+    def extract_with_validation(self, pdf_filepath, bank, statement_type):
+        """Extracts transactions from a statement and validates extraction successful
+
+        This function extracts statement metadata (year of last transaction, opening balance, closing balance), extracts
+        the transactions, then validates the transactions against the opening and closing balance to ensure all
+        transactions were successfully pulled.
+
+        This function is applied to one statement and does not aggregate across statements, to be performed by a
+        separate function.
+
+        :param pdf_filepath:The path to the file for loading
+        :param bank: The Bank the statement comes from
+        :param statement_type: The type of statement (Chequing, Visa)
+        :return: DataFrame of the transaction listing
+        """
+
+        # Extract the metadata
+        (year_of_last_transaction, opening_balance, closing_balance) = self.extract_statement_metadata(pdf_filepath, bank, statement_type)
+
+        # Extract the transactions
+        if bank == "RBC":
+            if statement_type == "Chequing":
+                transactions = self.standardized_rbc_chequing_transactions(self.extract_rbc_chequing_statement(pdf_filepath), year_of_last_transaction)
+            elif statement_type == "Visa":
+                transactions = self.standardized_rbc_visa_transactions(self.extract_rbc_visa_statement(pdf_filepath), year_of_last_transaction)
+
+        # Validate the transactions
+        self.validate_transactions(transactions, opening_balance, closing_balance)
+
+        # Return the transactions if validated
+        return transactions
+
+    def validate_transactions(self, transactions, opening_balance, closing_balance):
+        """Validates the transactions found in a Bank statement against the opening and closing balance found in the
+        statement. Errors would indicate that the transaction list was not fully pulled (or the opening/closing balance
+        were not detected correctly)
+
+        :param transactions:DataFrame containing transactions for one Bank statement in standardized format
+        :param opening_balance: The opening balance of the Bank statement as detected through the metadata function
+        :param closing_balance: The closing balance of the Bank statement as detected through the metadata function
+        :return:
+        """
+
+        # Use np.around() to compensate for miniscule rounding errors caused by using floats
+        return closing_balance == (opening_balance+np.around(transactions["Amount"].sum(), 2))
+
     def extract_rbc_chequing_statement(self, pdf_filepath):
         """Extracts a Pandas DataFrame from RBC chequing statements based on a cropped pattern
 

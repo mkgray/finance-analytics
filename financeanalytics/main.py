@@ -1,4 +1,7 @@
-from financeanalytics.planner import Planner
+from financeanalytics.dataloader import DataLoader
+from financeanalytics.dataquality import DataQuality
+from financeanalytics.statementprocessor import StatementProcessor
+
 
 # TODO: Unit Tests
 # TODO: Add proper logging
@@ -12,8 +15,11 @@ def welcome():
 if __name__ == '__main__':
     root_input_folder = welcome()
 
-    planner = Planner(root_input_folder)
+    # Load the data
+    structured_data = DataLoader().load_data(root_input_folder)
 
-    identified_data = planner.identify_data(root_input_folder)
+    # Run the DQ analysis
+    DataQuality().analyze_data_quality(structured_data)
 
-    data_gap_results = planner.analyze_data_gaps(identified_data)
+    # Extract the statements
+    print('Extract Statements Here')

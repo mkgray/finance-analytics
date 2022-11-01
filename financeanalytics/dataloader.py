@@ -27,7 +27,7 @@ class DataLoader:
         :type root_folder: string
         :return: DataFrame
         """
-        raw_list = self._detect_all_files_folders(root_folder)
+        raw_list = self._detect_relevant_files(root_folder)
         supported_bank_files = self._remove_unsupported_banks(raw_list)
         cleaned_file_list = self._remove_files_missing_dates(supported_bank_files)
         structured_data = self._structure_cleaned_file_listing(cleaned_file_list)

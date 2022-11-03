@@ -136,15 +136,15 @@ class StatementProcessor:
 
         # Remove records without either a deposit or a withdrawl
         transactions = transactions[~(((transactions["Deposits"]=="")|(transactions["Deposits"].isna()))
-                                      &((transactions["Withdrawl"]=="")|(transactions["Withdrawl"].isna())))]
+                                      &((transactions["Withdrawals"]=="")|(transactions["Withdrawals"].isna())))]
 
         # Propagate dates when multiple transactions occur on same day
         transactions["Date"] = transactions["Date"].replace("", np.nan).ffill(axis=0)
 
         # Merge withdrawls and deposits into one column
         transactions["Deposits"] = transactions["Deposits"].replace("", np.nan).fillna(0).astype(float)
-        transactions["Withdrawl"] = transactions["Withdrawl"].replace("", np.nan).fillna(0).astype(float)
-        transactions["Amount"] = transactions["Deposits"] - transactions["Withdrawl"]
+        transactions["Withdrawals"] = transactions["Withdrawals"].replace("", np.nan).fillna(0).astype(float)
+        transactions["Amount"] = transactions["Deposits"] - transactions["Withdrawals"]
 
         # Extract relevant columns
         standard_column_df = self._standardize_preprocessed_table(transactions,self.column_mapping_for_standardization['RBC']['Chequing'])

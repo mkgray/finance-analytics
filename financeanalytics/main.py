@@ -11,9 +11,9 @@ class FinanceAnalytics:
         return root_location
 
     def determine_statement_type(self, pdf_filepath):
-        if 'chequing' in str(pdf_filepath.lower()):
+        if 'chequing' in str(pdf_filepath).lower():
             return 'Chequing'
-        elif 'visa' in str(pdf_filepath.lower()):
+        elif 'visa' in str(pdf_filepath).lower():
             return 'Visa'
         else:
             raise NameError('Filepath does not specify chequing or visa statement type explicitly, please include')

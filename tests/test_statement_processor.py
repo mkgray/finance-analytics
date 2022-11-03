@@ -18,7 +18,7 @@ class TestStatementProcessor(unittest.TestCase):
                                    ["", "ContactlessInteracpurchase-9876\nTHESTEERSTORE", "55.55", "", "1700.02"],
                                    ["11Sep", "ContactlessInteracpurchase-1234\nTABLEROCKLOBSTER", "6.66", "", ""],
                                    ["", "ContactlessInteracpurchase-1111\nKARTHOUSE", "7.77", "", "1685.59"]],
-                                  columns=["Date", "Description", "Withdrawl", "Deposits", "Balance"])
+                                  columns=["Date", "Description", "Withdrawals", "Deposits", "Balance"])
 
         input_year = int(2020)
 
@@ -61,7 +61,7 @@ class TestStatementProcessor(unittest.TestCase):
                                    ["", "ContactlessInteracpurchase-9876\nTHESTEERSTORE", "55.55", "", "1700.02"],
                                    ["11Sep", "ContactlessInteracpurchase-1234\nTABLEROCKLOBSTER", "6.66", "", ""],
                                    ["", "ContactlessInteracpurchase-1111\nKARTHOUSE", "7.77", "", "1685.59"]],
-                                  columns=["Date", "Description", "Withdrawl", "Deposits", "Balance"])
+                                  columns=["Date", "Description", "Withdrawals", "Deposits", "Balance"])
 
         input_year = int(2020)
 
@@ -97,7 +97,7 @@ class TestStatementProcessor(unittest.TestCase):
                                    ["4Sep", "ContactlessInteracpurchase-9876\nTHESTEERSTORE", "55.55", "", "1700.02", -55.55],
                                    ["11Sep", "ContactlessInteracpurchase-1234\nTABLEROCKLOBSTER", "6.66", "", "", -6.66],
                                    ["11Sep", "ContactlessInteracpurchase-1111\nKARTHOUSE", "7.77", "", "1685.59", -7.77]],
-                                  columns=["Date", "Description", "Withdrawl", "Deposits", "Balance", "Amount"])
+                                  columns=["Date", "Description", "Withdrawals", "Deposits", "Balance", "Amount"])
 
         expected_output = pd.DataFrame([["12Aug", "Interacpurchase-9999 TEST-CO", -222.22],
                                         ["12Aug", "ContactlessInteracpurchase-9999\nBATTLEBOX-SQU", -11.11],

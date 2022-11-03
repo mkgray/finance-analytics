@@ -30,18 +30,19 @@ class DataLoader:
         raw_list = self._detect_relevant_files(root_folder)
         supported_bank_files = self._remove_unsupported_banks(raw_list)
         cleaned_file_list = self._remove_files_missing_dates(supported_bank_files)
-        structured_data = self._structure_cleaned_file_listing(cleaned_file_list)
+        structured_data = self._structure_cleaned_file_listing(cleaned_file_list, root_folder)
         return structured_data
 
-    def _structure_cleaned_file_listing(self, file_list):
+    def _structure_cleaned_file_listing(self, file_list, root_folder):
         """Converts list of files to be parsed into a structured format for initial data quality analysis
 
         :param file_list: list of all files to be structured
+        :param root_folder: The parent folder to use as the starting point for hierarchy
         :return: DataFrame of structure file breakdown including Bank, Hierarchy of Levels, and Filepath
         """
 
-        # Convert directly to a DataFrame and drop the root folder and filename
-        df = pd.DataFrame([x.parts[1:-1] for x in file_list])
+        # Convert directly to a DataFrame and drop the root folder (start) and filename (end)
+        df = pd.DataFrame([x.parts[len(Path(root_folder).parts):-1] for x in file_list])
 
         # Set up proper column names starting with Bank and Hierarchy Levels
         number_of_hierarchy_levels = len(df.columns) - 1
@@ -55,7 +56,7 @@ class DataLoader:
         logging.info("Detected {nhierarchy} hierarchy levels in data".format(nhierarchy = number_of_hierarchy_levels))
 
         # Manually convert Filepaths to Path format due to Pandas using OS specific format
-        df["Filepath"] = ['/'.join(x.parts) for x in file_list]
+        df["Filepath"] = file_list
 
         logging.info("Resultant structured table:")
         logging.info(df)

@@ -48,7 +48,7 @@ class DataQuality:
 
         # Extract the datestamp and change day to beginning of month
         structured_df["MonthStamp"] = structured_df["Filepath"].apply(
-            lambda x: datestamp_pattern.search(x).group(0)[:-2] + '01')
+            lambda x: datestamp_pattern.search(str(x)).group(0)[:-2] + '01')
 
         return structured_df
 

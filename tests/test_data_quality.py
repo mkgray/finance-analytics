@@ -7,19 +7,24 @@ class TestDataQuality(unittest.TestCase):
 
     def test_extract_month_stamp_bank_only_no_gaps(self):
 
-        input_data = pd.DataFrame([["RBC", "root_folder/RBC/Statement 2000-01-06.pdf"],
-                                   ["RBC", "root_folder/RBC/Statement 2000-02-09.pdf"],
-                                   ["RBC", "root_folder/RBC/Statement 2000-03-13.pdf"],
-                                   ["RBC", "root_folder/RBC/Statement 2000-04-06.pdf"],
-                                   ["RBC", "root_folder/RBC/Statement 2000-05-08.pdf"]],
+        input_data = pd.DataFrame([["RBC", "C:/root_folder/RBC/Statement 2000-01-06.pdf"],
+                                   ["RBC", "C:/root_folder/RBC/Statement 2000-02-09.pdf"],
+                                   ["RBC", "C:/root_folder/RBC/Statement 2000-03-13.pdf"],
+                                   ["RBC", "C:/root_folder/RBC/Statement 2000-04-06.pdf"],
+                                   ["RBC", "C:/root_folder/RBC/Statement 2000-05-08.pdf"]],
                                   columns=["Bank", "Filepath"])
 
-        expected_output = pd.DataFrame([["RBC", "root_folder/RBC/Statement 2000-01-06.pdf", "2000-01-01"],
-                                        ["RBC", "root_folder/RBC/Statement 2000-02-09.pdf", "2000-02-01"],
-                                        ["RBC", "root_folder/RBC/Statement 2000-03-13.pdf", "2000-03-01"],
-                                        ["RBC", "root_folder/RBC/Statement 2000-04-06.pdf", "2000-04-01"],
-                                        ["RBC", "root_folder/RBC/Statement 2000-05-08.pdf", "2000-05-01"]],
+        # Convert to proper path
+        input_data["Filepath"] = input_data["Filepath"].apply(lambda x: Path(x))
+
+        expected_output = pd.DataFrame([["RBC", "C:/root_folder/RBC/Statement 2000-01-06.pdf", "2000-01-01"],
+                                        ["RBC", "C:/root_folder/RBC/Statement 2000-02-09.pdf", "2000-02-01"],
+                                        ["RBC", "C:/root_folder/RBC/Statement 2000-03-13.pdf", "2000-03-01"],
+                                        ["RBC", "C:/root_folder/RBC/Statement 2000-04-06.pdf", "2000-04-01"],
+                                        ["RBC", "C:/root_folder/RBC/Statement 2000-05-08.pdf", "2000-05-01"]],
                                   columns=["Bank", "Filepath", "MonthStamp"])
+
+        expected_output["Filepath"] = expected_output["Filepath"].apply(lambda x: Path(x))
 
         DataQuality = dataquality.DataQuality()
 
@@ -29,15 +34,19 @@ class TestDataQuality(unittest.TestCase):
 
     def test_extract_month_stamp_bank_only_with_gaps(self):
 
-        input_data = pd.DataFrame([["RBC", "root_folder/RBC/Statement 2000-01-06.pdf"],
-                                   ["RBC", "root_folder/RBC/Statement 2000-03-13.pdf"],
-                                   ["RBC", "root_folder/RBC/Statement 2000-05-08.pdf"]],
+        input_data = pd.DataFrame([["RBC", "C:/root_folder/RBC/Statement 2000-01-06.pdf"],
+                                   ["RBC", "C:/root_folder/RBC/Statement 2000-03-13.pdf"],
+                                   ["RBC", "C:/root_folder/RBC/Statement 2000-05-08.pdf"]],
                                   columns=["Bank", "Filepath"])
 
-        expected_output = pd.DataFrame([["RBC", "root_folder/RBC/Statement 2000-01-06.pdf", "2000-01-01"],
-                                        ["RBC", "root_folder/RBC/Statement 2000-03-13.pdf", "2000-03-01"],
-                                        ["RBC", "root_folder/RBC/Statement 2000-05-08.pdf", "2000-05-01"]],
+        input_data["Filepath"] = input_data["Filepath"].apply(lambda x: Path(x))
+
+        expected_output = pd.DataFrame([["RBC", "C:/root_folder/RBC/Statement 2000-01-06.pdf", "2000-01-01"],
+                                        ["RBC", "C:/root_folder/RBC/Statement 2000-03-13.pdf", "2000-03-01"],
+                                        ["RBC", "C:/root_folder/RBC/Statement 2000-05-08.pdf", "2000-05-01"]],
                                   columns=["Bank", "Filepath", "MonthStamp"])
+
+        expected_output["Filepath"] = expected_output["Filepath"].apply(lambda x: Path(x))
 
         DataQuality = dataquality.DataQuality()
 
@@ -47,19 +56,23 @@ class TestDataQuality(unittest.TestCase):
 
     def test_extract_month_stamp_two_levels(self):
 
-        input_data = pd.DataFrame([["RBC", "A", "A-1", "root_folder/RBC/A/A-1/Statement 2000-01-06.pdf"],
-                                   ["RBC", "A", "A-1", "root_folder/RBC/A/A-1/Statement 2000-02-09.pdf"],
-                                   ["RBC", "A", "A-2", "root_folder/RBC/A/A-2/Statement 2000-03-13.pdf"],
-                                   ["RBC", "A", "A-2", "root_folder/RBC/A/A-2/Statement 2000-04-06.pdf"],
-                                   ["RBC", "A", "A-3", "root_folder/RBC/A/A-3/Statement 2000-05-08.pdf"]],
+        input_data = pd.DataFrame([["RBC", "A", "A-1", "C:/root_folder/RBC/A/A-1/Statement 2000-01-06.pdf"],
+                                   ["RBC", "A", "A-1", "C:/root_folder/RBC/A/A-1/Statement 2000-02-09.pdf"],
+                                   ["RBC", "A", "A-2", "C:/root_folder/RBC/A/A-2/Statement 2000-03-13.pdf"],
+                                   ["RBC", "A", "A-2", "C:/root_folder/RBC/A/A-2/Statement 2000-04-06.pdf"],
+                                   ["RBC", "A", "A-3", "C:/root_folder/RBC/A/A-3/Statement 2000-05-08.pdf"]],
                                   columns=["Bank", "Level 1", "Level 2", "Filepath"])
 
-        expected_output = pd.DataFrame([["RBC", "A", "A-1", "root_folder/RBC/A/A-1/Statement 2000-01-06.pdf", "2000-01-01"],
-                                        ["RBC", "A", "A-1", "root_folder/RBC/A/A-1/Statement 2000-02-09.pdf", "2000-02-01"],
-                                        ["RBC", "A", "A-2", "root_folder/RBC/A/A-2/Statement 2000-03-13.pdf", "2000-03-01"],
-                                        ["RBC", "A", "A-2", "root_folder/RBC/A/A-2/Statement 2000-04-06.pdf", "2000-04-01"],
-                                        ["RBC", "A", "A-3", "root_folder/RBC/A/A-3/Statement 2000-05-08.pdf", "2000-05-01"]],
+        input_data["Filepath"] = input_data["Filepath"].apply(lambda x: Path(x))
+
+        expected_output = pd.DataFrame([["RBC", "A", "A-1", "C:/root_folder/RBC/A/A-1/Statement 2000-01-06.pdf", "2000-01-01"],
+                                        ["RBC", "A", "A-1", "C:/root_folder/RBC/A/A-1/Statement 2000-02-09.pdf", "2000-02-01"],
+                                        ["RBC", "A", "A-2", "C:/root_folder/RBC/A/A-2/Statement 2000-03-13.pdf", "2000-03-01"],
+                                        ["RBC", "A", "A-2", "C:/root_folder/RBC/A/A-2/Statement 2000-04-06.pdf", "2000-04-01"],
+                                        ["RBC", "A", "A-3", "C:/root_folder/RBC/A/A-3/Statement 2000-05-08.pdf", "2000-05-01"]],
                                   columns=["Bank", "Level 1", "Level 2", "Filepath", "MonthStamp"])
+
+        expected_output["Filepath"] = expected_output["Filepath"].apply(lambda x: Path(x))
 
         DataQuality = dataquality.DataQuality()
 
@@ -69,21 +82,25 @@ class TestDataQuality(unittest.TestCase):
 
     def test_extract_month_stamp_five_levels_with_nones(self):
 
-        input_data = pd.DataFrame([["RBC", "A", "B", "C", "D", "E", "root_folder/RBC/A/A-1/Statement 2000-01-06.pdf"],
-                                        ["RBC", "A", "B", "C", "D", "NONE", "root_folder/RBC/A/A-1/Statement 2000-02-09.pdf"],
-                                        ["RBC", "A", "B", "C", "NONE", "NONE", "root_folder/RBC/A/A-2/Statement 2000-03-13.pdf"],
-                                        ["RBC", "A", "B", "NONE", "NONE", "NONE", "root_folder/RBC/A/A-2/Statement 2000-04-06.pdf"],
-                                        ["RBC", "A", "NONE", "NONE", "NONE", "NONE", "root_folder/RBC/A/A-3/Statement 2000-05-08.pdf"],
-                                        ["RBC", "NONE", "NONE", "NONE", "NONE", "NONE", "root_folder/RBC/A/A-3/Statement 2000-06-04.pdf"]],
+        input_data = pd.DataFrame([["RBC", "A", "B", "C", "D", "E", "C:/root_folder/RBC/A/A-1/Statement 2000-01-06.pdf"],
+                                        ["RBC", "A", "B", "C", "D", "NONE", "C:/root_folder/RBC/A/A-1/Statement 2000-02-09.pdf"],
+                                        ["RBC", "A", "B", "C", "NONE", "NONE", "C:/root_folder/RBC/A/A-2/Statement 2000-03-13.pdf"],
+                                        ["RBC", "A", "B", "NONE", "NONE", "NONE", "C:/root_folder/RBC/A/A-2/Statement 2000-04-06.pdf"],
+                                        ["RBC", "A", "NONE", "NONE", "NONE", "NONE", "C:/root_folder/RBC/A/A-3/Statement 2000-05-08.pdf"],
+                                        ["RBC", "NONE", "NONE", "NONE", "NONE", "NONE", "C:/root_folder/RBC/A/A-3/Statement 2000-06-04.pdf"]],
                                   columns=["Bank", "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Filepath"])
 
-        expected_output = pd.DataFrame([["RBC", "A", "B", "C", "D", "E", "root_folder/RBC/A/A-1/Statement 2000-01-06.pdf", "2000-01-01"],
-                                        ["RBC", "A", "B", "C", "D", "NONE", "root_folder/RBC/A/A-1/Statement 2000-02-09.pdf", "2000-02-01"],
-                                        ["RBC", "A", "B", "C", "NONE", "NONE", "root_folder/RBC/A/A-2/Statement 2000-03-13.pdf", "2000-03-01"],
-                                        ["RBC", "A", "B", "NONE", "NONE", "NONE", "root_folder/RBC/A/A-2/Statement 2000-04-06.pdf", "2000-04-01"],
-                                        ["RBC", "A", "NONE", "NONE", "NONE", "NONE", "root_folder/RBC/A/A-3/Statement 2000-05-08.pdf", "2000-05-01"],
-                                        ["RBC", "NONE", "NONE", "NONE", "NONE", "NONE", "root_folder/RBC/A/A-3/Statement 2000-06-04.pdf", "2000-06-01"]],
+        input_data["Filepath"] = input_data["Filepath"].apply(lambda x: Path(x))
+
+        expected_output = pd.DataFrame([["RBC", "A", "B", "C", "D", "E", "C:/root_folder/RBC/A/A-1/Statement 2000-01-06.pdf", "2000-01-01"],
+                                        ["RBC", "A", "B", "C", "D", "NONE", "C:/root_folder/RBC/A/A-1/Statement 2000-02-09.pdf", "2000-02-01"],
+                                        ["RBC", "A", "B", "C", "NONE", "NONE", "C:/root_folder/RBC/A/A-2/Statement 2000-03-13.pdf", "2000-03-01"],
+                                        ["RBC", "A", "B", "NONE", "NONE", "NONE", "C:/root_folder/RBC/A/A-2/Statement 2000-04-06.pdf", "2000-04-01"],
+                                        ["RBC", "A", "NONE", "NONE", "NONE", "NONE", "C:/root_folder/RBC/A/A-3/Statement 2000-05-08.pdf", "2000-05-01"],
+                                        ["RBC", "NONE", "NONE", "NONE", "NONE", "NONE", "C:/root_folder/RBC/A/A-3/Statement 2000-06-04.pdf", "2000-06-01"]],
                                   columns=["Bank", "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Filepath", "MonthStamp"])
+
+        expected_output["Filepath"] = expected_output["Filepath"].apply(lambda x: Path(x))
 
         DataQuality = dataquality.DataQuality()
 
@@ -93,14 +110,16 @@ class TestDataQuality(unittest.TestCase):
 
     def test_aggregate_bank_only(self):
 
-        input_data = pd.DataFrame([["RBC", "root_folder/RBC/Statement 2000-01-06.pdf", "2000-01-01"],
-                                   ["RBC", "root_folder/RBC/Statement 2000-02-13.pdf", "2000-02-01"],
-                                   ["RBC", "root_folder/RBC/Statement 2000-04-17.pdf", "2000-04-01"],
-                                   ["TD", "root_folder/RBC/Statement 2000-01-02.pdf", "2000-01-01"],
-                                   ["TD", "root_folder/RBC/Statement 2000-02-06.pdf", "2000-02-01"],
-                                   ["TD", "root_folder/RBC/Statement 2000-03-13.pdf", "2000-03-01"],
-                                   ["TD", "root_folder/RBC/Statement 2000-04-08.pdf", "2000-04-01"]
+        input_data = pd.DataFrame([["RBC", "C:/root_folder/RBC/Statement 2000-01-06.pdf", "2000-01-01"],
+                                   ["RBC", "C:/root_folder/RBC/Statement 2000-02-13.pdf", "2000-02-01"],
+                                   ["RBC", "C:/root_folder/RBC/Statement 2000-04-17.pdf", "2000-04-01"],
+                                   ["TD", "C:/root_folder/RBC/Statement 2000-01-02.pdf", "2000-01-01"],
+                                   ["TD", "C:/root_folder/RBC/Statement 2000-02-06.pdf", "2000-02-01"],
+                                   ["TD", "C:/root_folder/RBC/Statement 2000-03-13.pdf", "2000-03-01"],
+                                   ["TD", "C:/root_folder/RBC/Statement 2000-04-08.pdf", "2000-04-01"]
                                    ], columns=["Bank", "Filepath", "MonthStamp"])
+
+        input_data["Filepath"] = input_data["Filepath"].apply(lambda x: Path(x))
 
         expected_output = pd.DataFrame([["RBC", "2000-01-01", "2000-04-01", ["2000-01-01", "2000-02-01", "2000-04-01"]],
                                         ["TD", "2000-01-01", "2000-04-01", ["2000-01-01", "2000-02-01", "2000-03-01", "2000-04-01"]],
@@ -166,18 +185,22 @@ class TestDataQuality(unittest.TestCase):
 
     def test_remove_duplicate_data_bank_only(self):
 
-        input_data = pd.DataFrame([["RBC", "root_folder/RBC/Statement 2000-01-06.pdf", "2000-01-01"],
-                                   ["RBC", "root_folder/rbc/Statement 2000-01-06.pdf", "2000-01-01"],
-                                   ["RBC", "root_folder/RBC/Statement 2000-03-03.pdf", "2000-03-01"],
-                                   ["RBC", "root_folder/RBC/Statement 2000-04-06.pdf", "2000-04-01"],
-                                   ["RBC", "root_folder/RBC/Statement 2000-05-08.pdf", "2000-05-01"]],
+        input_data = pd.DataFrame([["RBC", "C:/root_folder/RBC/Statement 2000-01-06.pdf", "2000-01-01"],
+                                   ["RBC", "C:/root_folder/rbc/Statement 2000-01-06.pdf", "2000-01-01"],
+                                   ["RBC", "C:/root_folder/RBC/Statement 2000-03-03.pdf", "2000-03-01"],
+                                   ["RBC", "C:/root_folder/RBC/Statement 2000-04-06.pdf", "2000-04-01"],
+                                   ["RBC", "C:/root_folder/RBC/Statement 2000-05-08.pdf", "2000-05-01"]],
                                   columns=["Bank", "Filepath", "MonthStamp"])
 
-        expected_output = pd.DataFrame([["RBC", "root_folder/RBC/Statement 2000-01-06.pdf", "2000-01-01"],
-                                        ["RBC", "root_folder/RBC/Statement 2000-03-03.pdf", "2000-03-01"],
-                                        ["RBC", "root_folder/RBC/Statement 2000-04-06.pdf", "2000-04-01"],
-                                        ["RBC", "root_folder/RBC/Statement 2000-05-08.pdf", "2000-05-01"]],
+        input_data["Filepath"] = input_data["Filepath"].apply(lambda x: Path(x))
+
+        expected_output = pd.DataFrame([["RBC", "C:/root_folder/RBC/Statement 2000-01-06.pdf", "2000-01-01"],
+                                        ["RBC", "C:/root_folder/RBC/Statement 2000-03-03.pdf", "2000-03-01"],
+                                        ["RBC", "C:/root_folder/RBC/Statement 2000-04-06.pdf", "2000-04-01"],
+                                        ["RBC", "C:/root_folder/RBC/Statement 2000-05-08.pdf", "2000-05-01"]],
                                        columns=["Bank", "Filepath", "MonthStamp"])
+
+        expected_output["Filepath"] = expected_output["Filepath"].apply(lambda x: Path(x))
 
         DataQuality = dataquality.DataQuality()
 
@@ -187,14 +210,18 @@ class TestDataQuality(unittest.TestCase):
 
     def test_remove_duplicate_data_two_level(self):
 
-        input_data = pd.DataFrame([["RBC", "A", "B", "root_folder/RBC/A/B/Statement 2000-01-06.pdf", "2000-01-01"],
-                                   ["RBC", "A", "B", "root_folder/RBC/a/B/Statement 2000-01-06.pdf", "2000-01-01"],
-                                   ["RBC", "A", "B", "root_folder/RBC/A/B/Statement 2000-02-06.pdf", "2000-02-01"]],
+        input_data = pd.DataFrame([["RBC", "A", "B", "C:/root_folder/RBC/A/B/Statement 2000-01-06.pdf", "2000-01-01"],
+                                   ["RBC", "A", "B", "C:/root_folder/RBC/a/B/Statement 2000-01-06.pdf", "2000-01-01"],
+                                   ["RBC", "A", "B", "C:/root_folder/RBC/A/B/Statement 2000-02-06.pdf", "2000-02-01"]],
                                   columns=["Bank", "Level 1", "Level 2", "Filepath", "MonthStamp"])
 
-        expected_output = pd.DataFrame([["RBC", "A", "B", "root_folder/RBC/A/B/Statement 2000-01-06.pdf", "2000-01-01"],
-                                        ["RBC", "A", "B", "root_folder/RBC/A/B/Statement 2000-02-06.pdf", "2000-02-01"]],
+        input_data["Filepath"] = input_data["Filepath"].apply(lambda x: Path(x))
+
+        expected_output = pd.DataFrame([["RBC", "A", "B", "C:/root_folder/RBC/A/B/Statement 2000-01-06.pdf", "2000-01-01"],
+                                        ["RBC", "A", "B", "C:/root_folder/RBC/A/B/Statement 2000-02-06.pdf", "2000-02-01"]],
                                        columns=["Bank", "Level 1", "Level 2", "Filepath", "MonthStamp"])
+
+        expected_output["Filepath"] = expected_output["Filepath"].apply(lambda x: Path(x))
 
         DataQuality = dataquality.DataQuality()
 
@@ -204,19 +231,23 @@ class TestDataQuality(unittest.TestCase):
 
     def test_remove_duplicate_data_many_levels(self):
 
-        input_data = pd.DataFrame([["RBC", "A", "B", "C", "D", "E", "root_folder/RBC/A/B/C/D/E/Statement 2000-01-06.pdf", "2000-01-01"],
-                                   ["RBC", "A", "B", "C", "D", "E", "root_folder/RBC/a/B/C/D/E/Statement 2000-01-06.pdf", "2000-01-01"],
-                                   ["RBC", "A", "B", "C", "D", "E", "root_folder/RBC/A/B/C/D/E/Statement 2000-03-06.pdf", "2000-03-01"],
-                                   ["RBC", "A", "B", "NONE", "NONE", "NONE", "root_folder/RBC/a/B/Statement 2000-01-06.pdf", "2000-01-01"],
-                                   ["RBC", "A", "B", "NONE", "NONE", "NONE", "root_folder/RBC/A/B/Statement 2000-01-06.pdf", "2000-01-01"],
-                                   ["RBC", "A", "B", "NONE", "NONE", "NONE", "root_folder/RBC/A/B/Statement 2000-02-06.pdf", "2000-02-01"]],
+        input_data = pd.DataFrame([["RBC", "A", "B", "C", "D", "E", "C:/root_folder/RBC/A/B/C/D/E/Statement 2000-01-06.pdf", "2000-01-01"],
+                                   ["RBC", "A", "B", "C", "D", "E", "C:/root_folder/RBC/a/B/C/D/E/Statement 2000-01-06.pdf", "2000-01-01"],
+                                   ["RBC", "A", "B", "C", "D", "E", "C:/root_folder/RBC/A/B/C/D/E/Statement 2000-03-06.pdf", "2000-03-01"],
+                                   ["RBC", "A", "B", "NONE", "NONE", "NONE", "C:/root_folder/RBC/a/B/Statement 2000-01-06.pdf", "2000-01-01"],
+                                   ["RBC", "A", "B", "NONE", "NONE", "NONE", "C:/root_folder/RBC/A/B/Statement 2000-01-06.pdf", "2000-01-01"],
+                                   ["RBC", "A", "B", "NONE", "NONE", "NONE", "C:/root_folder/RBC/A/B/Statement 2000-02-06.pdf", "2000-02-01"]],
                                   columns=["Bank", "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Filepath", "MonthStamp"])
 
-        expected_output = pd.DataFrame([["RBC", "A", "B", "C", "D", "E", "root_folder/RBC/A/B/C/D/E/Statement 2000-01-06.pdf", "2000-01-01"],
-                                        ["RBC", "A", "B", "C", "D", "E", "root_folder/RBC/A/B/C/D/E/Statement 2000-03-06.pdf", "2000-03-01"],
-                                        ["RBC", "A", "B", "NONE", "NONE", "NONE", "root_folder/RBC/a/B/Statement 2000-01-06.pdf", "2000-01-01"],
-                                        ["RBC", "A", "B", "NONE", "NONE", "NONE", "root_folder/RBC/A/B/Statement 2000-02-06.pdf", "2000-02-01"]],
+        input_data["Filepath"] = input_data["Filepath"].apply(lambda x: Path(x))
+
+        expected_output = pd.DataFrame([["RBC", "A", "B", "C", "D", "E", "C:/root_folder/RBC/A/B/C/D/E/Statement 2000-01-06.pdf", "2000-01-01"],
+                                        ["RBC", "A", "B", "C", "D", "E", "C:/root_folder/RBC/A/B/C/D/E/Statement 2000-03-06.pdf", "2000-03-01"],
+                                        ["RBC", "A", "B", "NONE", "NONE", "NONE", "C:/root_folder/RBC/a/B/Statement 2000-01-06.pdf", "2000-01-01"],
+                                        ["RBC", "A", "B", "NONE", "NONE", "NONE", "C:/root_folder/RBC/A/B/Statement 2000-02-06.pdf", "2000-02-01"]],
                                        columns=["Bank", "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Filepath", "MonthStamp"])
+
+        expected_output["Filepath"] = expected_output["Filepath"].apply(lambda x: Path(x))
 
         DataQuality = dataquality.DataQuality()
 

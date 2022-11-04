@@ -42,11 +42,6 @@ class FinanceAnalytics:
         pd.set_option('display.max_rows', None)
         print('Extract Statements Here')
 
-        #pdf_filepath = structured_data.iloc[0, :]["Filepath"]
-        #bank = structured_data.iloc[0, :]["Bank"]
-        #statement_type = self.determine_statement_type(pdf_filepath)
-        #StatementProcessor().extract_with_validation(pdf_filepath, bank, statement_type)
-
         total_records = structured_data.shape[0]
 
         for index, row in structured_data.iterrows():
@@ -54,9 +49,12 @@ class FinanceAnalytics:
             pdf_filepath = row["Filepath"]
             bank = row["Bank"]
             statement_type = self.determine_statement_type(pdf_filepath)
+
+            logging.warning("Processing file: {fname}".format(fname=pdf_filepath))
+
             statement_df = StatementProcessor().extract_with_validation(pdf_filepath, bank, statement_type)
 
-            logging.warning("Processed file {idx} of {max_idx}, ({prcnt}% Complete): {fname}".format(idx=index+1, max_idx=total_records, prcnt=round((float(index+1)/total_records)*100, 2), fname=pdf_filepath))
+            #logging.warning("Processed file {idx} of {max_idx}, ({prcnt}% Complete): {fname}".format(idx=index+1, max_idx=total_records, prcnt=round((float(index+1)/total_records)*100, 2), fname=pdf_filepath))
 
 
 if __name__ == '__main__':

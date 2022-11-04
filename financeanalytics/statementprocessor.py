@@ -84,7 +84,10 @@ class StatementProcessor:
                 # odd pages
                 extracted_table_for_page = (page
                                             .extract_table(self.rbc_chequing_table_settings_odd_pages))
-            df_all_pages.append(pd.DataFrame(extracted_table_for_page[1::], columns=self.rbc_chequing_columns))
+
+            # Ignore empty pages
+            if extracted_table_for_page is not None:
+                df_all_pages.append(pd.DataFrame(extracted_table_for_page[1::], columns=self.rbc_chequing_columns))
 
         # After conversion merge all the df pages into a single table
         return pd.concat(df_all_pages, axis=0).reset_index(drop=True)
@@ -114,7 +117,8 @@ class StatementProcessor:
             except:
                 logging.info("Blank page, ignoring")
 
-            df_all_pages.append(page_df)
+            if page_df is not None:
+                df_all_pages.append(page_df)
 
         # After conversion merge all the df pages into a single table
         merged_df = pd.concat(df_all_pages, axis=0).reset_index(drop=True)

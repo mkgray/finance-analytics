@@ -2,7 +2,11 @@ from financeanalytics.dataloader import DataLoader
 from financeanalytics.dataquality import DataQuality
 from financeanalytics.statementprocessor import StatementProcessor
 
+from pathlib import Path
+
 import logging
+
+import pandas as pd
 
 class FinanceAnalytics:
 
@@ -27,6 +31,34 @@ class FinanceAnalytics:
         statement_type = self.determine_statement_type(pdf_filepath)
         return StatementProcessor().extract_with_validation(pdf_filepath, bank, statement_type)
 
+    def extract_all_statements(self, structured_data):
+        total_records = structured_data.shape[0]
+        column_names = list(structured_data.columns)
+
+        df_all_statements = []
+
+        for index, row in structured_data.iterrows():
+            pdf_filepath = row["Filepath"]
+            bank = row["Bank"]
+            statement_type = self.determine_statement_type(pdf_filepath)
+
+            statement_df = StatementProcessor().extract_with_validation(pdf_filepath, bank, statement_type)
+
+            # Append the hierarchy onto the results
+            statement_df[column_names] = row.values
+
+            # Add the statement with hierarchy to the complete dataset
+            df_all_statements.append(statement_df)
+
+            logging.warning("Processed file {idx} of {max_idx}, ({prcnt}% Complete): {fname}".format(idx=index + 1, max_idx=total_records, prcnt=round((float(index + 1) / total_records) * 100, 2), fname=pdf_filepath))
+
+        # Merge statements into one dataframe
+        return pd.concat(df_all_statements, axis=0).reset_index(drop=True)
+
+    def write_output_to_location(self, all_statements, root_location):
+        output_path = Path(root_location + '/extracted_transactions.xlsx')
+        all_statements.to_excel(output_path, index=False)
+
     def __init__(self):
         root_input_folder = self.welcome()
 
@@ -36,27 +68,9 @@ class FinanceAnalytics:
         # Run the DQ analysis
         DataQuality().analyze_data_quality(structured_data)
 
-        # Extract the statements
-        import pandas as pd
-        pd.set_option('display.max_columns', None)
-        pd.set_option('display.max_rows', None)
-        print('Extract Statements Here')
-
-        total_records = structured_data.shape[0]
-
-        for index, row in structured_data.iterrows():
-
-            pdf_filepath = row["Filepath"]
-            bank = row["Bank"]
-            statement_type = self.determine_statement_type(pdf_filepath)
-
-            logging.warning("Processing file: {fname}".format(fname=pdf_filepath))
-
-            statement_df = StatementProcessor().extract_with_validation(pdf_filepath, bank, statement_type)
-
-            #logging.warning("Processed file {idx} of {max_idx}, ({prcnt}% Complete): {fname}".format(idx=index+1, max_idx=total_records, prcnt=round((float(index+1)/total_records)*100, 2), fname=pdf_filepath))
-
+        # Extract the statements and write
+        self.write_output_to_location(self.extract_all_statements(structured_data), root_input_folder)
 
 if __name__ == '__main__':
     logging.getLogger().setLevel(logging.WARNING)
-    FinanceAnalytics()
+    complete_df = FinanceAnalytics()

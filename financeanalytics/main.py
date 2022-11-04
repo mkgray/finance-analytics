@@ -5,6 +5,7 @@ from financeanalytics.statementprocessor import StatementProcessor
 from pathlib import Path
 
 import logging
+from tqdm import tqdm
 
 import pandas as pd
 
@@ -37,7 +38,7 @@ class FinanceAnalytics:
 
         df_all_statements = []
 
-        for index, row in structured_data.iterrows():
+        for index, row in tqdm(structured_data.iterrows(), total=structured_data.shape[0]):
             pdf_filepath = row["Filepath"]
             bank = row["Bank"]
             statement_type = self.determine_statement_type(pdf_filepath)
@@ -50,7 +51,7 @@ class FinanceAnalytics:
             # Add the statement with hierarchy to the complete dataset
             df_all_statements.append(statement_df)
 
-            logging.warning("Processed file {idx} of {max_idx}, ({prcnt}% Complete): {fname}".format(idx=index + 1, max_idx=total_records, prcnt=round((float(index + 1) / total_records) * 100, 2), fname=pdf_filepath))
+            #logging.warning("Processed file {idx} of {max_idx}, ({prcnt}% Complete): {fname}".format(idx=index + 1, max_idx=total_records, prcnt=round((float(index + 1) / total_records) * 100, 2), fname=pdf_filepath))
 
         # Merge statements into one dataframe
         return pd.concat(df_all_statements, axis=0).reset_index(drop=True)

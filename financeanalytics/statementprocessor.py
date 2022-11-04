@@ -142,8 +142,8 @@ class StatementProcessor:
         transactions["Date"] = transactions["Date"].replace("", np.nan).ffill(axis=0)
 
         # Merge withdrawls and deposits into one column
-        transactions["Deposits"] = transactions["Deposits"].replace("", np.nan).fillna(0).astype(float)
-        transactions["Withdrawals"] = transactions["Withdrawals"].replace("", np.nan).fillna(0).astype(float)
+        transactions["Deposits"] = transactions["Deposits"].str.replace(",", "").replace("", np.nan).fillna(0).astype(float)
+        transactions["Withdrawals"] = transactions["Withdrawals"].str.replace(",", "").replace("", np.nan).fillna(0).astype(float)
         transactions["Amount"] = transactions["Deposits"] - transactions["Withdrawals"]
 
         # Extract relevant columns

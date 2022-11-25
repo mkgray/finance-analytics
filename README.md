@@ -1,6 +1,6 @@
 # Finance Analytics
 
-The Finance Analytics package is intended to be an open source, easily modifiable and configurable framework for relatively plug-and-play processing of personal finance data.
+The Finance Analytics package is intended to be an open source, easily modifiable and configurable framework for relatively plug-and-play processing of personal finance data. Current functionality limited to extracting transactions from Bank Statements to output Excel file for users own analytics. Future development to contain out-of-the-box analytics to be applied to the output.
 
 ## How to Use
 

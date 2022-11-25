@@ -8,3 +8,6 @@ The Finance Analytics package is intended to be an open source, easily modifiabl
 - Package converts all statement pdfs to tabular form
 - Package can go on to perform general finance analytics using some out-of-the-box options (or user can perform own analytics easily at this point forward)
 
+Listing of currently supported Bank-Products:
+- RBC-Chequing
+- RBC-Visa

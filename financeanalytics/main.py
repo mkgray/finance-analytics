@@ -9,13 +9,9 @@ from tqdm import tqdm
 
 import pandas as pd
 
-class FinanceAnalytics:
+import argparse
 
-    def welcome(self):
-        print("Welcome to the Financial Planner Application\n(C) Matt Gray 2022")
-        print("Please specify the folder location where the data is stored:")
-        root_location = "C:\\FinanceData"
-        return root_location
+class FinanceAnalytics:
 
     def determine_statement_type(self, pdf_filepath):
         if 'chequing' in str(pdf_filepath).lower():
@@ -60,8 +56,8 @@ class FinanceAnalytics:
         output_path = Path(root_location + '/extracted_transactions.xlsx')
         all_statements.to_excel(output_path, index=False)
 
-    def __init__(self):
-        root_input_folder = self.welcome()
+    def __init__(self, root_input_folder):
+        logging.info("Finance Analytics target location: " + root_input_folder)
 
         # Load the data
         structured_data = DataLoader().load_data(root_input_folder)
@@ -74,4 +70,11 @@ class FinanceAnalytics:
 
 if __name__ == '__main__':
     logging.getLogger().setLevel(logging.WARNING)
-    complete_df = FinanceAnalytics()
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--root_folder', type=str, required=True)
+
+    args = parser.parse_args()
+
+    complete_df = FinanceAnalytics(args.root_folder)

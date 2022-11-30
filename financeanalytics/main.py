@@ -36,6 +36,7 @@ class FinanceAnalytics:
         self.progress_bar["maximum"] = structured_data.shape[0]
         files_processed = 0
 
+        # Iteratively process financial statements
         for index, row in structured_data.iterrows():
             pdf_filepath = row["Filepath"]
             bank = row["Bank"]
@@ -58,8 +59,8 @@ class FinanceAnalytics:
         # Merge statements into one dataframe
         return pd.concat(df_all_statements, axis=0).reset_index(drop=True)
 
-    def write_output_to_location(self, all_statements, root_location):
-        output_path = Path(root_location + '/extracted_transactions.xlsx')
+    def write_output_to_location(self, all_statements):
+        output_path = Path(self.output_dir + '/extracted_transactions.xlsx')
         all_statements.to_excel(output_path, index=False)
 
     def get_directory(self):
@@ -71,12 +72,12 @@ class FinanceAnalytics:
         self.label_output_location.config(text="Output Location: {}/extracted_transactions.xlsx".format(self.root_dir))
 
         # Enable output directory choosing and processing functions once input location determined
-        # button_choose_out.config(state="normal") # disabled until feature is completed
+        self.button_choose_out.config(state="normal")
         self.button_run.config(state="normal")
 
     def get_output(self):
         self.output_dir = askdirectory(title="Choose Output Folder for Storing Processed Results")
-        self.label_output_location.config(text="Output Location: {}/extracted_transactions.xlsx".format(self.root_dir))
+        self.label_output_location.config(text="Output Location: {}/extracted_transactions.xlsx".format(self.output_dir))
 
     def run_processing(self):
         # Load the data
@@ -86,7 +87,7 @@ class FinanceAnalytics:
         DataQuality().analyze_data_quality(structured_data)
 
         # Extract the statements and write
-        self.write_output_to_location(self.extract_all_statements(structured_data), self.root_dir)
+        self.write_output_to_location(self.extract_all_statements(structured_data))
 
     def __init__(self):
         self.root = Tk()
@@ -112,8 +113,8 @@ class FinanceAnalytics:
         self.button_run.grid(row=2, column=0)
         self.button_quit.grid(row=2, column=4)
 
-        self.label_root_folder.grid(row=0, column=2, columnspan=3)
-        self.label_output_location.grid(row=1, column=2, columnspan=3)
+        self.label_root_folder.grid(row=0, column=2, columnspan=3, sticky="w")
+        self.label_output_location.grid(row=1, column=2, columnspan=3, sticky="w")
 
         self.progress_bar.grid(row=2, column=1, columnspan=3)
 

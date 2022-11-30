@@ -32,7 +32,7 @@ Navigate to the root folder of the cloned repo (FinanceAnalytics)
 
 Run the following command in the command prompt / terminal
 ```
-python main.py --root_folder C:\Path\To\Root\Folder
+python main.py
 ``` 
 
 Parameter root_folder specifies the location of the topmost folder to be used in financial statement extraction

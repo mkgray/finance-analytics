@@ -75,11 +75,20 @@ class FinanceAnalytics:
         self.button_choose_out.config(state="normal")
         self.button_run.config(state="normal")
 
+        # Update status note so user knows how to proceed
+        self.status_label.config(text="Either change the output location for the Excel document or choose to run the program")
+
     def get_output(self):
         self.output_dir = askdirectory(title="Choose Output Folder for Storing Processed Results")
         self.label_output_location.config(text="Output Location: {}/extracted_transactions.xlsx".format(self.output_dir))
 
+        # Update status note so user knows how to proceed
+        self.status_label.config(text="Run the program if the locations are correct")
+
     def run_processing(self):
+        # Update status note
+        self.status_label.config(text="Processing financial statements, please wait...")
+
         # Load the data
         structured_data = DataLoader().load_data(self.root_dir)
 
@@ -88,6 +97,9 @@ class FinanceAnalytics:
 
         # Extract the statements and write
         self.write_output_to_location(self.extract_all_statements(structured_data))
+
+        # Update status note
+        self.status_label.config(text="Processing complete!")
 
     def __init__(self):
         self.root = Tk()
@@ -113,7 +125,7 @@ class FinanceAnalytics:
         self.title_label = Label(self.titleframe, text="Finance Analytics Application", font=("Arial", 18))
 
         # Initialize Status Frame
-        self.status_entry = Label(self.statusframe, width=100, text="Begin by selecting the root folder location for processing")
+        self.status_label = Label(self.statusframe, width=100, text="Begin by selecting the root folder location for processing")
 
         # Initialize Parameters Widgets
         self.button_choose_root = Button(self.parametersframe, text="Choose Root Folder", command=self.get_directory, padx=20)
@@ -133,7 +145,7 @@ class FinanceAnalytics:
         self.title_label.grid(row=0, column=0)
 
         # Place Status Widgets
-        self.status_entry.grid(row=0, column=0)
+        self.status_label.grid(row=0, column=0)
 
         # Place Parameters Widgets
         self.button_choose_root.grid(row=0, column=0)

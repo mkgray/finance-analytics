@@ -1,4 +1,4 @@
-from tkinter import Tk, Button, Label, ttk
+from tkinter import Tk, Button, Entry, Frame, Label, ttk
 from tkinter.filedialog import askdirectory
 
 from financeanalytics.dataloader import DataLoader
@@ -94,29 +94,63 @@ class FinanceAnalytics:
         self.root.title("Finance Analytics")
         self.root.iconbitmap("../assets/icons/finance_analytics_logo.ico")
 
-        # Initialize Buttons
-        self.button_choose_root = Button(self.root, text="Choose Root Folder", command=self.get_directory, padx=20)
-        self.button_choose_out = Button(self.root, text="Choose Output Location", command=self.get_output, state="disabled", padx=7)
-        self.button_run = Button(self.root, text="Run", command=self.run_processing, state="disabled", padx=15)
-        self.button_quit = Button(self.root, text="Quit", command=self.root.quit, padx=13)
+        # Set up frames for organizing the front end
+        app_width = 600
+        self.titleframe = Frame(self.root, width=app_width)
+        self.statusframe = Frame(self.root, width=app_width)
+        self.parametersframe = Frame(self.root, width=app_width)
+        self.startstopframe = Frame(self.root, width=app_width)
+        self.notesframe = Frame(self.root, width=app_width)
 
-        # Initialize Labels
-        self.label_root_folder = Label(self.root, text="Root Folder: ", anchor="w")
-        self.label_output_location = Label(self.root, text="Output Location: ", anchor="w")
+        # Organize frame positions
+        self.titleframe.grid(row=0, column=0)
+        self.statusframe.grid(row=1, column=0)
+        self.parametersframe.grid(row=2, column=0, sticky="w")
+        self.startstopframe.grid(row=3, column=0)
+        self.notesframe.grid(row=4, column=0, sticky="w")
 
-        # Initialize Progress Bar
-        self.progress_bar = ttk.Progressbar(self.root, orient="horizontal", length=200, mode="determinate")
+        # Initialize Title Frame
+        self.title_label = Label(self.titleframe, text="Finance Analytics Application", font=("Arial", 18))
 
-        # Place widgets
-        self.button_choose_root.grid(row=0, column=0, columnspan=2)
-        self.button_choose_out.grid(row=1, column=0, columnspan=2)
-        self.button_run.grid(row=2, column=0)
-        self.button_quit.grid(row=2, column=4)
+        # Initialize Status Frame
+        self.status_entry = Label(self.statusframe, width=100, text="Begin by selecting the root folder location for processing")
 
-        self.label_root_folder.grid(row=0, column=2, columnspan=3, sticky="w")
-        self.label_output_location.grid(row=1, column=2, columnspan=3, sticky="w")
+        # Initialize Parameters Widgets
+        self.button_choose_root = Button(self.parametersframe, text="Choose Root Folder", command=self.get_directory, padx=20)
+        self.button_choose_out = Button(self.parametersframe, text="Choose Output Location", command=self.get_output, state="disabled", padx=7)
+        self.label_root_folder = Label(self.parametersframe, text="Root Folder: ")
+        self.label_output_location = Label(self.parametersframe, text="Output Location: ")
 
-        self.progress_bar.grid(row=2, column=1, columnspan=3)
+        # Initialize Start Stop widgets
+        self.button_run = Button(self.startstopframe, text="Run", command=self.run_processing, state="disabled", padx=15)
+        self.button_quit = Button(self.startstopframe, text="Quit", command=self.root.quit, padx=13)
+        self.progress_bar = ttk.Progressbar(self.startstopframe, orient="horizontal", length=200, mode="determinate")
+
+        # Initialize Notes Widgets
+        self.notes_label = Label(self.notesframe, text="Supported Financial Statements:\nRBC Chequing\nRBC Visa")
+
+        # Place Title Widgets
+        self.title_label.grid(row=0, column=0)
+
+        # Place Status Widgets
+        self.status_entry.grid(row=0, column=0)
+
+        # Place Parameters Widgets
+        self.button_choose_root.grid(row=0, column=0)
+        self.button_choose_out.grid(row=1, column=0)
+        self.label_root_folder.grid(row=0, column=2, sticky="w")
+        self.label_output_location.grid(row=1, column=2, sticky="w")
+
+        # Place Start Stop Widgets
+        self.button_run.grid(row=0, column=0)
+        self.progress_bar.grid(row=0, column=1)
+        self.button_quit.grid(row=0, column=2)
+
+        # Place Notes Widgets
+        self.notes_label.grid(row=0, column=0)
+
+        # Stop window resizing
+        self.root.resizable(False, False)
 
         # Run main loop
         self.root.mainloop()

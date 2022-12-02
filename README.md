@@ -35,8 +35,6 @@ Run the following command in the command prompt / terminal
 python main.py
 ``` 
 
-Parameter root_folder specifies the location of the topmost folder to be used in financial statement extraction
-
 ## Listing of currently supported Bank-Products:
 * RBC
   * Chequing

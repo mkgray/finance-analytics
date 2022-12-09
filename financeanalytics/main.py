@@ -121,8 +121,8 @@ class FinanceAnalytics:
         self.titleframe.grid(row=0, column=0)
         self.statusframe.grid(row=1, column=0)
         self.parametersframe.grid(row=2, column=0, sticky="w")
-        self.startstopframe.grid(row=3, column=0)
-        self.notesframe.grid(row=4, column=0, sticky="w")
+        self.notesframe.grid(row=3, column=0)
+        self.startstopframe.grid(row=4, column=0)
 
     def _ui_title_setup(self):
         """Sets up the title frame components"""
@@ -166,13 +166,27 @@ class FinanceAnalytics:
         self.progress_bar.grid(row=0, column=1)
         self.button_quit.grid(row=0, column=2)
 
+    def toggle_show_supported_statements(self):
+        """Toggles between showing all the supported financial statements and hiding on the GUI"""
+        if self.show_supported_banks == False:
+            self.notes_label.grid(row=1, column=0)
+            self.expand_retract_supported_banks.config(text="Hide Supported Financial Statements")
+            self.show_supported_banks = True
+        else:
+            self.notes_label.grid_remove()
+            self.expand_retract_supported_banks.config(text="Show Supported Financial Statements")
+            self.show_supported_banks = False
+
+
     def _ui_notes_setup(self):
         """Sets up the notes section of the application to provide build-specific info and other static information"""
         # Initialize Notes Widgets
-        self.notes_label = Label(self.notesframe, text="Supported Financial Statements:\nRBC Chequing\nRBC Visa")
+        self.notes_label = Label(self.notesframe, text="RBC Chequing\nRBC Visa")
+        self.expand_retract_supported_banks = Button(self.notesframe, text="Show Supported Financial Statements", command=self.toggle_show_supported_statements)
+        self.show_supported_banks = False
 
         # Place Notes Widgets
-        self.notes_label.grid(row=0, column=0)
+        self.expand_retract_supported_banks.grid(row=0, column=0)
 
     def initialize_ui(self):
         """Initializes all the components of the user interface"""
@@ -184,8 +198,8 @@ class FinanceAnalytics:
         self._ui_title_setup()
         self._ui_status_setup()
         self._ui_parameter_setup()
-        self._ui_startstop_setup()
         self._ui_notes_setup()
+        self._ui_startstop_setup()
 
         # Stop window resizing
         self.root.resizable(False, False)

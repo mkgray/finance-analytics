@@ -14,7 +14,7 @@ jobs:
       uses: actions/setup-python@v4.4.0
       with:
         # Version range or exact version of Python or PyPy to use, using SemVer's version range syntax. Reads from .python-version if unset.
-        python-version: 3.10
+        python-version: 3.10.8
         # Used to specify a package manager for caching in the default directory. Supported values: pip, pipenv, poetry.
         cache: pip
         # Set this option if you want the action to check for the latest available version that satisfies the version spec.

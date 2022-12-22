@@ -192,7 +192,6 @@ class FinanceAnalytics:
         """Initializes all the components of the user interface"""
         self.root = Tk()
         self.root.title("Finance Analytics")
-        self.root.iconbitmap("../assets/icons/finance_analytics_logo.ico")
 
         self._ui_frame_setup()
         self._ui_title_setup()

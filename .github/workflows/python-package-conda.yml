@@ -1,6 +1,12 @@
 name: Python Package using Conda
 
-on: [workflow_dispatch]
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
 
 jobs:
   test-matrix:

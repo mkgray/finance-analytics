@@ -1,0 +1,12 @@
+[project]
+name = "finance-analytics"
+description = "extract and analyze Bank statements"
+version = "0.0.1"
+dependencies = [
+    "pandas == 1.5.1",
+    "pdfplumber == 0.7.5"
+]
+[tool.setuptools]
+py-modules = []
+[testenv]
+commands = "python -m unittest discover"

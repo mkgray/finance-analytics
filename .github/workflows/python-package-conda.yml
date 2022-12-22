@@ -3,10 +3,13 @@ name: Python Package using Conda
 on: [workflow_dispatch]
 
 jobs:
-  build-linux:
-    runs-on: ubuntu-latest
+  build:
+
+    runs-on: ${{ matrix.os }}
+
     strategy:
-      max-parallel: 5
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
 
     steps:
     - uses: actions/checkout@v3

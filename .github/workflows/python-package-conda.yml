@@ -29,6 +29,10 @@ jobs:
         echo $CONDA/bin >> $GITHUB_PATH
     - name: Install dependencies
       run: |
+        # Update conda to fix the pip subprocess errors on macos
+        if [ "$RUNNER_OS" == "macOS" ]; then
+          conda update -n base -c defaults conda
+        fi
         conda env update --file environment.yml --name base
     - name: Lint with flake8
       run: |

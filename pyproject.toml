@@ -6,6 +6,9 @@ dependencies = [
     "pandas == 1.5.1",
     "pdfplumber == 0.7.5"
 ]
+[build-system]
+requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
 [tool.setuptools]
 py-modules = []
 [testenv]

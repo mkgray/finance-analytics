@@ -1,0 +1,7 @@
+name: finance-analytics-conda-environment
+
+dependencies:
+  - python=3.10
+  - pandas=1.5.1
+  - pip:
+    - pdfplumber==0.7.5

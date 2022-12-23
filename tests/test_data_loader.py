@@ -5,22 +5,6 @@ import pandas as pd
 
 class TestDataLoader(unittest.TestCase):
 
-    def test_file_recognition(self):
-        # Intended to be run on the main project folder, not compatible with running in different working path
-        expected_files = ["detection_test/RBC/Chequing/empty.pdf",
-                          "detection_test/RBC/V1sa/empty.pdf",
-                          "detection_test/TD/Checking/empty.pdf",
-                          "detection_test/TD/Visa/empty.pdf"]
-        expected_output = [Path(x) for x in expected_files]
-
-        DataLoader = dataloader.DataLoader()
-
-        root_folder = "detection_test"
-
-        actual_output = DataLoader._detect_relevant_files(root_folder)
-
-        self.assertEqual(expected_output, actual_output)
-
     def test_detect_relevant_files_default_value(self):
         input_files = ["root_folder/RBC/Chequing/empty.pdf",
                        "root_folder/RbC/Chequing/empty.pdf",

@@ -1,7 +1,6 @@
 name: Python Package using Conda
 
 on:
-  workflow_dispatch:
   release:
     types: [published]
 
@@ -54,7 +53,10 @@ jobs:
     needs: test-matrix
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout and pull tag
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: Set up Python
         uses: actions/setup-python@v4.4.0
         with:

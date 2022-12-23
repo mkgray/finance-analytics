@@ -9,6 +9,5 @@ dependencies = [
 requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2"]
 build-backend = "setuptools.build_meta"
 [tool.setuptools_scm]
-py-modules = []
 [testenv]
 commands = "python -m unittest discover"

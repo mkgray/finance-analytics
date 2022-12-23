@@ -1,5 +1,6 @@
 [project]
 name = "finance-analytics"
+dynamic = ["version"]
 description = "extract and analyze Bank statements"
 dependencies = [
     "pandas == 1.5.1",

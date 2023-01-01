@@ -24,7 +24,7 @@ class FinanceAnalytics:
         statement_type = self.determine_statement_type(pdf_filepath)
         return StatementProcessor().extract_with_validation(pdf_filepath, bank, statement_type)
 
-    def extract_all_statements(self, structured_data):
+    def extract_all_statements(self, structured_data, gui_mode=False):
         """Loops through all statements in the dataframe to extract transactions"""
         total_records = structured_data.shape[0]
         column_names = list(structured_data.columns)
@@ -37,17 +37,7 @@ class FinanceAnalytics:
 
         # Iteratively process financial statements
         for index, row in structured_data.iterrows():
-            pdf_filepath = row["Filepath"]
-            bank = row["Bank"]
-            statement_type = self.determine_statement_type(pdf_filepath)
-
-            statement_df = StatementProcessor().extract_with_validation(pdf_filepath, bank, statement_type)
-
-            # Append the hierarchy onto the results
-            statement_df[column_names] = row.values
-
-            # Add the statement with hierarchy to the complete dataset
-            df_all_statements.append(statement_df)
+            self._process_single_statement(row, df_all_statements, column_names)
 
             # Update the progress bar
             files_processed += 1
@@ -56,6 +46,20 @@ class FinanceAnalytics:
 
         # Merge statements into one dataframe
         return pd.concat(df_all_statements, axis=0).reset_index(drop=True)
+
+    def _process_single_statement(self, record, processed_record_collection, column_names):
+        pdf_filepath = record["Filepath"]
+        bank = record["Bank"]
+        statement_type = self.determine_statement_type(pdf_filepath)
+
+        statement_df = StatementProcessor().extract_with_validation(pdf_filepath, bank, statement_type)
+
+        # Append the hierarchy onto the results
+        statement_df[column_names] = record.values
+
+        # Add the statement with hierarchy to the complete dataset
+        return processed_record_collection.append(statement_df)
+
 
     def write_output_to_location(self, all_statements, output_dir, output_fname="extracted_transactions", output_format="xlsx"):
         """Outputs the structured transaction data to the users designated output location"""
@@ -67,7 +71,7 @@ class FinanceAnalytics:
         else:
             raise ValueError('Import write format specified')
 
-    def run(self, input_dir, output_dir, output_fname="extracted_transactions", output_format="xlsx"):
+    def run(self, input_dir, output_dir, output_fname="extracted_transactions", output_format="xlsx", gui_mode=False):
         """Runs the complete Finance Analytics process, including:
         1) Detect statements
         2) Metadata DQ analysis

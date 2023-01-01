@@ -14,7 +14,7 @@ if __name__ == "__main__":
 
     parser.add_argument("-f", "--output_filename", required=False, type=str, default="output_table")
 
-    parser.add_argument("-x", "--output_extension", required=True, default="xlsx", choices=["csv", "xlsx"])
+    parser.add_argument("-x", "--output_extension", required=False, default="xlsx", choices=["csv", "xlsx"])
 
     args = parser.parse_args()
 
@@ -22,6 +22,13 @@ if __name__ == "__main__":
 
     # Input should not be a filetype, should be a directory
 
-    # If output is None, default to input location and default filename
+    input_directory = args.input_directory
+    output_directory = args.output_directory
+    output_filename = args.output_filename
+    output_extension = args.output_extension
 
-    FinanceAnalytics()
+    # If output is None, default to input location and default filename
+    if output_directory is None:
+        output_directory = input_directory
+
+    FinanceAnalytics().run(input_dir=input_directory, output_dir=output_directory)

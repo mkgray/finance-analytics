@@ -28,7 +28,11 @@ class DataLoader:
         :return: DataFrame
         """
         raw_list = self._detect_relevant_files(root_folder)
+        if not raw_list:
+            raise ValueError("No statements detected")
         supported_bank_files = self._remove_unsupported_banks(raw_list)
+        if not supported_bank_files:
+            raise ValueError("No statements from supported banks detected\nIs there a folder for the Bank?")
         cleaned_file_list = self._remove_files_missing_dates(supported_bank_files)
         structured_data = self._structure_cleaned_file_listing(cleaned_file_list, root_folder)
         return structured_data

@@ -31,18 +31,27 @@ class FinanceAnalytics:
 
         df_all_statements = []
 
-        # Set the GUI progress bar
-        #self.progress_bar["maximum"] = structured_data.shape[0]
-        files_processed = 0
+        """Start of CMD LINE processing method"""
+        if gui_mode == False:
+            from tqdm import tqdm
+            for index, row in tqdm(structured_data.iterrows(), total=structured_data.shape[0]):
+                self._process_single_statement(row, df_all_statements, column_names)
 
-        # Iteratively process financial statements
-        for index, row in structured_data.iterrows():
-            self._process_single_statement(row, df_all_statements, column_names)
+        else:
+            """ Start of GUI processing method"""
+            # Set the GUI progress bar
+            #self.progress_bar["maximum"] = structured_data.shape[0]
+            files_processed = 0
 
-            # Update the progress bar
-            files_processed += 1
-            #self.progress_bar["value"] = files_processed
-            #self.progress_bar.update()
+            # Iteratively process financial statements
+            for index, row in structured_data.iterrows():
+                self._process_single_statement(row, df_all_statements, column_names)
+
+                # Update the progress bar
+                files_processed += 1
+                #self.progress_bar["value"] = files_processed
+                #self.progress_bar.update()
+
 
         # Merge statements into one dataframe
         return pd.concat(df_all_statements, axis=0).reset_index(drop=True)

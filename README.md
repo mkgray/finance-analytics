@@ -27,12 +27,20 @@ Example folder structure:
       * Visa Statement-9999 2000-04-12.pdf
       * Visa Statement-9999 2000-05-07.pdf
 
-### Running the Application (Directly)
+### Running the Application - GUI (Directly)
 Navigate to the root folder of the cloned repo (FinanceAnalytics)
 
 Run the following command in the command prompt / terminal
 ```
-python main.py
+python main_gui.py
+``` 
+
+### Running the Application - Command Prompt (Directly)
+Navigate to the root folder of the cloned repo (FinanceAnalytics)
+
+Run the following command in the command prompt / terminal
+```
+python main.py -i /path/to/bank/statement/root/folder
 ``` 
 
 ### Running the Application (Docker)

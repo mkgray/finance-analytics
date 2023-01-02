@@ -24,7 +24,7 @@ class FinanceAnalytics:
         statement_type = self.determine_statement_type(pdf_filepath)
         return StatementProcessor().extract_with_validation(pdf_filepath, bank, statement_type)
 
-    def extract_all_statements(self, structured_data, gui_mode=False):
+    def extract_all_statements(self, structured_data, gui_object=None):
         """Loops through all statements in the dataframe to extract transactions"""
         total_records = structured_data.shape[0]
         column_names = list(structured_data.columns)
@@ -32,7 +32,7 @@ class FinanceAnalytics:
         df_all_statements = []
 
         """Start of CMD LINE processing method"""
-        if gui_mode == False:
+        if gui_object == None:
             from tqdm import tqdm
             for index, row in tqdm(structured_data.iterrows(), total=structured_data.shape[0]):
                 self._process_single_statement(row, df_all_statements, column_names)
@@ -40,7 +40,7 @@ class FinanceAnalytics:
         else:
             """ Start of GUI processing method"""
             # Set the GUI progress bar
-            #self.progress_bar["maximum"] = structured_data.shape[0]
+            gui_object.progress_bar["maximum"] = structured_data.shape[0]
             files_processed = 0
 
             # Iteratively process financial statements
@@ -49,8 +49,8 @@ class FinanceAnalytics:
 
                 # Update the progress bar
                 files_processed += 1
-                #self.progress_bar["value"] = files_processed
-                #self.progress_bar.update()
+                gui_object.progress_bar["value"] = files_processed
+                gui_object.progress_bar.update()
 
 
         # Merge statements into one dataframe
@@ -80,7 +80,7 @@ class FinanceAnalytics:
         else:
             raise ValueError('Import write format specified')
 
-    def run(self, input_dir, output_dir, output_fname="extracted_transactions", output_format="xlsx", gui_mode=False):
+    def run(self, input_dir, output_dir, output_fname="extracted_transactions", output_format="xlsx", gui_object=None):
         """Runs the complete Finance Analytics process, including:
         1) Detect statements
         2) Metadata DQ analysis
@@ -94,5 +94,5 @@ class FinanceAnalytics:
         DataQuality().analyze_data_quality(structured_data)
 
         # Extract the statements and write
-        self.write_output_to_location(self.extract_all_statements(structured_data), output_dir, output_fname, output_format)
+        self.write_output_to_location(self.extract_all_statements(structured_data, gui_object), output_dir, output_fname, output_format)
 

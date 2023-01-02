@@ -10,7 +10,7 @@ class FinanceAnalyticsGUI:
         # Update status note
         self.status_label.config(text="Processing financial statements, please wait...")
 
-        FinanceAnalytics().run(self.root_dir, self.output_dir)
+        FinanceAnalytics().run(input_dir=self.root_dir, output_dir=self.output_dir, gui_object=self)
 
         # Update status note
         self.status_label.config(text="Processing complete!")

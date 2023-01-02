@@ -21,7 +21,6 @@ if __name__ == "__main__":
     # Input quality checks
 
     # Input should not be a filetype, should be a directory
-
     input_directory = args.input_directory
     output_directory = args.output_directory
     output_filename = args.output_filename
@@ -31,4 +30,4 @@ if __name__ == "__main__":
     if output_directory is None:
         output_directory = input_directory
 
-    FinanceAnalytics().run(input_dir=input_directory, output_dir=output_directory)
+    FinanceAnalytics().run(input_dir=input_directory, output_dir=output_directory, output_fname=output_filename, output_format=output_extension)

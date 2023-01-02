@@ -52,11 +52,11 @@ class FinanceAnalytics:
                 gui_object.progress_bar["value"] = files_processed
                 gui_object.progress_bar.update()
 
-
         # Merge statements into one dataframe
         return pd.concat(df_all_statements, axis=0).reset_index(drop=True)
 
     def _process_single_statement(self, record, processed_record_collection, column_names):
+        """Function for extracting transactions from a single Bank statement in the run loop"""
         pdf_filepath = record["Filepath"]
         bank = record["Bank"]
         statement_type = self.determine_statement_type(pdf_filepath)

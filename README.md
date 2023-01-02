@@ -27,13 +27,25 @@ Example folder structure:
       * Visa Statement-9999 2000-04-12.pdf
       * Visa Statement-9999 2000-05-07.pdf
 
-### Running the Application
+### Running the Application (Directly)
 Navigate to the root folder of the cloned repo (FinanceAnalytics)
 
 Run the following command in the command prompt / terminal
 ```
 python main.py
 ``` 
+
+### Running the Application (Docker)
+Navigate the terminal to the project root folder and build the docker image from the Dockerfile
+(Alternatively download the latest pre-built Docker image - not yet available)
+```
+docker build -t finance-analytics .
+```
+
+Run a Docker container from the image which mounts your root folder of Bank Statements as follows
+```
+docker run --rm --name finance-analytics -v /path/to/bank/statement/root/folder:/input -d finance-analytics:latest; docker logs -f finance-analytics
+```
 
 ## Listing of currently supported Bank-Products:
 * RBC
